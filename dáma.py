@@ -29,20 +29,33 @@ class piece:
         self.rows = rows
         self.columns = columns
 
-    def jump_possible(self, direction):
-        self.newrows = self.rows + 1*self.colour
-        self.newcolumns = chr(ord(self.columns) + 1*direction)
-        x = new_position(self)
-        k = board[x]
-        if k != "" and k.colour != self.colour:
-            print("yes")
-        else:
-            print("no")
+    def jump_possible(self):
+        direction = 1
+        for i in range(2):
+            direction = direction*(-1)
+            self.newrows = self.rows + 1*self.colour
+            self.newcolumns = chr(ord(self.columns) + 1*direction)
+            x = new_position(self)
+            k = board[x]
+            if k != "" and k.colour != self.colour:
+                self.newrows = self.newrows + 1*self.colour
+                self.newcolumns = chr(ord(self.newcolumns) + 1*direction)
+                x = new_position(self)
+                if board[x] == "":
+                    print(self.name, "can jump", direction)
+                else:
+                    print("There's not an empty space")
+            else:
+                print("There's noone to jump over")
     
     def move(self, direction):
         global turn
         if turn == self.colour:
             if self in board.values():
+                if self.colour == 1: array = black
+                else: array = white
+                for i in array:
+                    i.jump_possible()
                 self.newrows = self.rows + 1*self.colour
                 self.newcolumns = chr(ord(self.columns) + 1*direction) #direction... -1=left, 1=right
                 x = new_position(self)
@@ -60,6 +73,7 @@ class piece:
                 print("Tato figurka již neexistuje.")
         else:
             print("Nejsi na tahu.")
+
     def take(self, direction):
         pass
 
@@ -100,6 +114,14 @@ board = {
     "8B" : B9, "8D" : B10, "8F" : B11, "8H" : B12,
     }
 
-W9.move(1)
-B1.move(1)
-W9.jump_possible(-1)
+black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
+white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
+
+W11.move(-1)
+
+#B1.move(1)
+#W12.move(1)
+#B2.move(1)
+#W11.jump_possible()
+#W9.move(1)
+#B1.jump_possible()
