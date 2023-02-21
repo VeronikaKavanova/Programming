@@ -1,8 +1,16 @@
 import pygame
+
 #postup jak na git
 #git add .
 #git commit -m "smyslnuplna zprava"
 #git push
+
+#vice vetvi
+#git branch nova_vetev
+#git switch nazev_vetev
+#kdyz poprve nova vetev. git push --set-upstream origin pokus
+#git push
+
 turn = 1 
 
 def old_position(self):
