@@ -1,5 +1,5 @@
 import pygame
-
+#komentar
 turn = 1 
 
 def old_position(self):
