@@ -1,5 +1,8 @@
 import pygame
-#komentar
+#postup jak na git
+#git add .
+#git commit -m "smyslnuplna zprava"
+#git push
 turn = 1 
 
 def old_position(self):
