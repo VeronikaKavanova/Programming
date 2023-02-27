@@ -11,7 +11,8 @@ import pygame
 #kdyz poprve nova vetev. git push --set-upstream origin pokus
 #git push
 
-turn = 1 
+turn = 1
+can_jump = []
 
 def old_position(self):
     x = str(self.rows) + self.columns
@@ -36,26 +37,31 @@ class piece:
             self.newrows = self.rows + 1*self.colour
             self.newcolumns = chr(ord(self.columns) + 1*direction)
             x = new_position(self)
-            k = board[x]
-            if k != "" and k.colour != self.colour:
-                self.newrows = self.newrows + 1*self.colour
-                self.newcolumns = chr(ord(self.newcolumns) + 1*direction)
-                x = new_position(self)
-                if board[x] == "":
-                    print(self.name, "can jump", direction)
-                else:
-                    print("There's not an empty space")
-            else:
-                print("There's noone to jump over")
+            if x in board.keys():
+                k = board[x]
+                if k != "" and k.colour != self.colour:
+                    self.newrows = self.newrows + 1*self.colour
+                    self.newcolumns = chr(ord(self.newcolumns) + 1*direction)
+                    x = new_position(self)
+                    if x in board.keys(): 
+                        if board[x] == "":
+                            print(self.name, "can jump", direction)
+                            can_jump.append([self, direction])
+                        #else:
+                            #print("There's not an empty space")
+                #lse:
+                    #print("There's noone to jump over")
     
     def move(self, direction):
         global turn
         if turn == self.colour:
             if self in board.values():
-                if self.colour == 1: array = black
-                else: array = white
+                if self.colour == 1: array = white
+                else: array = black
+                can_jump.clear()
                 for i in array:
                     i.jump_possible()
+                print(can_jump)
                 self.newrows = self.rows + 1*self.colour
                 self.newcolumns = chr(ord(self.columns) + 1*direction) #direction... -1=left, 1=right
                 x = new_position(self)
@@ -117,11 +123,12 @@ board = {
 black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
 white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
 
-W11.move(-1)
 
-#B1.move(1)
-#W12.move(1)
-#B2.move(1)
-#W11.jump_possible()
-#W9.move(1)
-#B1.jump_possible()
+W11.move(-1)
+B1.move(1)
+W12.move(1)
+B2.move(1)
+W9.move(1)
+B3.move(1)
+for i in can_jump:
+    print(i)
