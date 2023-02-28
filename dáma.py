@@ -36,17 +36,17 @@ class piece:
             direction = direction*(-1)
             self.newrows = self.rows + 1*self.colour
             self.newcolumns = chr(ord(self.columns) + 1*direction)
-            x = new_position(self)
-            if x in board.keys():
-                k = board[x]
+            m = new_position(self)
+            if m in board.keys():
+                k = board[m]
                 if k != "" and k.colour != self.colour:
                     self.newrows = self.newrows + 1*self.colour
                     self.newcolumns = chr(ord(self.newcolumns) + 1*direction)
-                    x = new_position(self)
-                    if x in board.keys(): 
-                        if board[x] == "":
-                            print(self.name, "can jump", direction)
-                            can_jump.append([self, direction])
+                    n = new_position(self)
+                    if n in board.keys(): 
+                        if board[n] == "":
+                            print(self, "can jump", direction)
+                            can_jump.append([self, direction, m, n])
                         #else:
                             #print("There's not an empty space")
                 #lse:
@@ -73,7 +73,7 @@ class piece:
                         self.rows = self.newrows
                         self.columns = self.newcolumns
                         turn = turn*(-1)
-                        print(self.name, x)
+                        print(self, x)
                     else:
                         print("Toto políčko neexistuje nebo je obsazené.")
                 else:
@@ -83,14 +83,34 @@ class piece:
         else:
             print("Nejsi na tahu.")
 
-    def take(self):
+    def take(self, direction):
         global turn
         if turn == self.colour:
             if self in board.values():
                 can_jump.clear()
                 self.jump_possible()
-                if self in can_jump():
-                    print(can_jump)
+                for i in can_jump:
+                    if self in i:
+                        if direction == i[1]:
+                            if self.colour == 1: array = black
+                            else: array = white
+                            array.remove(board[i[2]])
+                            print([str(obj) for obj in array])
+                            board[i[3]] = self
+                            board[i[2]] = ""
+                            y = old_position(self)
+                            board[y] = ""
+                            position = list(i[2])
+                            self.rows = position[0]
+                            self.columns = position[1]
+                            turn = turn*(-1)
+                            print(self, "takes", i[2])
+                            break
+                        else:
+                            print("no") 
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 W1 = piece(1,"W1",1,"A")
@@ -136,7 +156,6 @@ white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
 
 W11.move(-1)
 B1.move(1)
-W12.move(1)
-B2.move(1)
-W9.move(1)
-B3.move(1)
+W11.take(-1)
+B6.take(1)
+B6.take(-1)
