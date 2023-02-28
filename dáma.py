@@ -45,7 +45,7 @@ class piece:
                     n = new_position(self)
                     if n in board.keys(): 
                         if board[n] == "":
-                            print(self, "can jump", direction)
+                            #print(self, "can jump", direction)
                             can_jump.append([self, direction, m, n])
                         #else:
                             #print("There's not an empty space")
@@ -61,7 +61,7 @@ class piece:
                 can_jump.clear()
                 for i in array:
                     i.jump_possible()
-                print(can_jump)
+                #print(can_jump)
                 if can_jump == []:
                     self.newrows = self.rows + 1*self.colour
                     self.newcolumns = chr(ord(self.columns) + 1*direction) #direction... -1=left, 1=right
@@ -103,9 +103,11 @@ class piece:
                             position = list(i[2])
                             self.rows = position[0]
                             self.columns = position[1]
-                            turn = turn*(-1)
                             print(self, "takes", i[2])
+                            self.take(input())
+                            turn = turn*(-1)
                             break
+                
                         else:
                             print("no") 
 
