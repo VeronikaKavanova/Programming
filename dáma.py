@@ -62,26 +62,36 @@ class piece:
                 for i in array:
                     i.jump_possible()
                 print(can_jump)
-                self.newrows = self.rows + 1*self.colour
-                self.newcolumns = chr(ord(self.columns) + 1*direction) #direction... -1=left, 1=right
-                x = new_position(self)
-                if (x in board.keys() and board[x] == ""):
-                    y = old_position(self)
-                    board[x] = self
-                    board[y] = ""
-                    self.rows = self.newrows
-                    self.columns = self.newcolumns
-                    turn = turn*(-1)
-                    print(self.name, x)
+                if can_jump == []:
+                    self.newrows = self.rows + 1*self.colour
+                    self.newcolumns = chr(ord(self.columns) + 1*direction) #direction... -1=left, 1=right
+                    x = new_position(self)
+                    if (x in board.keys() and board[x] == ""):
+                        y = old_position(self)
+                        board[x] = self
+                        board[y] = ""
+                        self.rows = self.newrows
+                        self.columns = self.newcolumns
+                        turn = turn*(-1)
+                        print(self.name, x)
+                    else:
+                        print("Toto políčko neexistuje nebo je obsazené.")
                 else:
-                    print("Toto políčko neexistuje nebo je obsazené.")
+                    print("Someone can jump.")
             else:
                 print("Tato figurka již neexistuje.")
         else:
             print("Nejsi na tahu.")
 
-    def take(self, direction):
-        pass
+    def take(self):
+        global turn
+        if turn == self.colour:
+            if self in board.values():
+                can_jump.clear()
+                self.jump_possible()
+                if self in can_jump():
+                    print(can_jump)
+
 
 W1 = piece(1,"W1",1,"A")
 W2 = piece(1,"W2",1,"C")
@@ -130,5 +140,3 @@ W12.move(1)
 B2.move(1)
 W9.move(1)
 B3.move(1)
-for i in can_jump:
-    print(i)
