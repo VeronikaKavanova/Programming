@@ -14,14 +14,6 @@ import pygame
 turn = 1
 can_jump = []
 
-def old_position(self):
-    x = str(self.rows) + self.columns
-    return x
-
-def new_position(self):
-    x = str(self.newrows) + self.newcolumns 
-    return x
-
 class piece:
     
     def __init__(self, colour, name, rows, columns):
@@ -33,24 +25,42 @@ class piece:
     def is_queen(self):
         if self.rows == (4.5+3.5*self.colour):
             self.__class__ = queen
+            if self.colour == 1: array = white_queens
+            else: array = black_queens
+            array.append(self)
+            return True
+    
+    def old_position(self):
+        x = str(self.rows) + self.columns
+        return x
+
+    def new_position(self):
+        x = str(self.newrows) + self.newcolumns 
+        return x
+
+    def update(self, direction):
+        self.newrows = self.rows + self.colour
+        self.newcolumns = chr(ord(self.columns) + direction)
+    
+    def update_jump(self, direction):
+        self.newrows = self.newrows + self.colour
+        self.newcolumns = chr(ord(self.newcolumns) + direction)
 
     def jump_possible(self):
-        direction = 1
+        side = 1
         for i in range(2):
-            direction = direction*(-1)
-            self.newrows = self.rows + 1*self.colour
-            self.newcolumns = chr(ord(self.columns) + 1*direction)
-            m = new_position(self)
+            side = side*(-1)
+            self.update(side)
+            m = self.new_position()
             if m in board.keys():
                 k = board[m]
                 if k != "" and k.colour != self.colour:
-                    self.newrows = self.newrows + 1*self.colour
-                    self.newcolumns = chr(ord(self.newcolumns) + 1*direction)
-                    n = new_position(self)
+                    self.update_jump(side)
+                    n = self.new_position()
                     if n in board.keys(): 
                         if board[n] == "":
-                            #print(self, "can jump", direction)
-                            can_jump.append([self, direction, m, n])
+                            #print(self, "can jump", side)
+                            can_jump.append([self, side, m, n])
                         #else:
                             #print("There's not an empty space")
                 #lse:
@@ -63,15 +73,15 @@ class piece:
                 if self.colour == 1: array = white
                 else: array = black
                 can_jump.clear()
+                bla = direction
                 for i in array:
                     i.jump_possible()
                 #print(can_jump)
                 if can_jump == []:
-                    self.newrows = self.rows + 1*self.colour
-                    self.newcolumns = chr(ord(self.columns) + 1*direction) #direction... -1=left, 1=right
-                    x = new_position(self)
+                    self.update(bla)
+                    x = self.new_position()
                     if (x in board.keys() and board[x] == ""):
-                        y = old_position(self)
+                        y = self.old_position()
                         board[x] = self
                         board[y] = ""
                         self.rows = self.newrows
@@ -103,12 +113,13 @@ class piece:
                             print([str(obj) for obj in array])
                             board[i[3]] = self
                             board[i[2]] = ""
-                            y = old_position(self)
+                            y = self.old_position()
                             board[y] = ""
                             position = list(i[3])
                             self.rows = int(position[0])
                             self.columns = position[1]
-                            self.is_queen()
+                            if self.is_queen() == True:
+                                break
                             print(self, "takes", i[2])
                             print(self, i[3])
                             can_jump.clear()
@@ -128,10 +139,22 @@ class piece:
         return f"{self.name}"
 
 class queen(piece):
-
     
+    def move(self, direction):
+        #direction = [number, horizontal, vertical]
+        super().move(direction)
 
+    def is_queen(self):
+        pass
 
+    def update(self, direction):
+        number = direction[0]
+        horizontal = direction[1]
+        vertical = direction[2]
+        self.newrows = self.rows + number*vertical     
+        self.newcolumns = chr(ord(self.columns) + number*horizontal)
+        
+        
 W1 = piece(1,"W1",1,"A")
 W2 = piece(1,"W2",1,"C")
 W3 = piece(1,"W3",1,"E")
@@ -171,6 +194,8 @@ board = {
 
 black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
 white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
+black_queens = []
+white_queens = []
 
 
 W12.move(-1)
@@ -181,3 +206,5 @@ W4.move(1)
 B2.move(-1)
 W11.move(-1)
 B2.take(1)
+W8.move(1)
+B2.move([3, -1, 1])
