@@ -30,6 +30,10 @@ class piece:
         self.rows = rows
         self.columns = columns
 
+    def is_queen(self):
+        if self.rows == (4.5+3.5*self.colour):
+            self.__class__ = queen
+
     def jump_possible(self):
         direction = 1
         for i in range(2):
@@ -72,6 +76,7 @@ class piece:
                         board[y] = ""
                         self.rows = self.newrows
                         self.columns = self.newcolumns
+                        self.is_queen
                         turn = turn*(-1)
                         print(self, x)
                     else:
@@ -100,11 +105,19 @@ class piece:
                             board[i[2]] = ""
                             y = old_position(self)
                             board[y] = ""
-                            position = list(i[2])
-                            self.rows = position[0]
+                            position = list(i[3])
+                            self.rows = int(position[0])
                             self.columns = position[1]
+                            self.is_queen()
                             print(self, "takes", i[2])
-                            self.take(input())
+                            print(self, i[3])
+                            can_jump.clear()
+                            self.jump_possible()
+                            for i in can_jump:
+                                if self in i:
+                                    direction = int(input("Write in which direction should the piece jump: "))
+                                    break
+                            self.take(direction)
                             turn = turn*(-1)
                             break
                 
@@ -113,6 +126,10 @@ class piece:
 
     def __str__(self):
         return f"{self.name}"
+
+class queen(piece):
+
+    
 
 
 W1 = piece(1,"W1",1,"A")
@@ -156,8 +173,11 @@ black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
 white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
 
 
+W12.move(-1)
+B1.move(-1)
+W8.move(-1)
+B5.move(1)
+W4.move(1)
+B2.move(-1)
 W11.move(-1)
-B1.move(1)
-W11.take(-1)
-B6.take(1)
-B6.take(-1)
+B2.take(1)
