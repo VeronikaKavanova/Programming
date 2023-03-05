@@ -46,7 +46,6 @@ class piece:
     def can_queens_jump(self):
         if self.colour == 1: array = white
         else: array = black
-        can_jump_queens.clear()
         for i in array:
             if i.__class__.__name__ == "queen":
                 i.jump_possible()
@@ -94,7 +93,7 @@ class piece:
                         self.columns = self.newcolumns
                         self.is_queen
                         turn = turn*(-1)
-                        print(y, "to", x)
+                        print(self, y, "to", x)
                     else:
                         print("Toto políčko neexistuje nebo je obsazené.")
                 else:
@@ -108,10 +107,14 @@ class piece:
         global turn
         if turn == self.colour:
             if self in board.values():
+                can_jump_queens.clear()
                 self.can_queens_jump()
                 if can_jump_queens == []:
+                    can_jump.clear()
                     self.jump_possible()
-                    for i in can_jump:
+                    if self.__class__.__name__ == "queen": jumping_possibilities = can_jump_queens
+                    else: jumping_possibilities = can_jump 
+                    for i in jumping_possibilities:
                         if self in i:
                             if goal_empty_space == i[2]:
                                 if self.colour == 1: array = black
@@ -125,8 +128,8 @@ class piece:
                                 position = list(i[2])
                                 self.rows = int(position[0])
                                 self.columns = position[1]
-                                print(y, "takes", i[1])
-                                print(y, "to", i[2])
+                                print(self, y, "takes", i[1])
+                                print(self, y, "to", i[2])
                                 if self.is_queen() == True:
                                     break
                                 can_jump.clear()
@@ -139,8 +142,8 @@ class piece:
                                 turn = turn*(-1)
                                 break
                 
-                        else:
-                            print("no") 
+                else:
+                    print("A queen can jump") 
 
     def __str__(self):
         return f"{self.name}"
@@ -155,6 +158,9 @@ class queen(piece):
         super().jump(goal_empty_space)
 
     def is_queen(self):
+        pass
+
+    def can_queens_jump(self):
         pass
 
     def update(self, direction):
@@ -239,4 +245,5 @@ W11.move(-1)
 B2.jump("3E")
 W8.move(1)
 B2.move([2, -1, 1])
-B2.jump_possible()
+W10.move(-1)
+B2.jump("5G")
