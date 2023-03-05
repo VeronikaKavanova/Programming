@@ -13,6 +13,7 @@ import pygame
 
 turn = 1
 can_jump = []
+can_jump_queens = []
 
 class piece:
     
@@ -25,9 +26,9 @@ class piece:
     def is_queen(self):
         if self.rows == (4.5+3.5*self.colour):
             self.__class__ = queen
-            if self.colour == 1: array = white_queens
-            else: array = black_queens
-            array.append(self)
+            #if self.colour == 1: array = white_queens
+            #else: array = black_queens
+            #array.append(self)
             return True
     
     def old_position(self):
@@ -41,26 +42,31 @@ class piece:
     def update(self, direction):
         self.newrows = self.rows + self.colour
         self.newcolumns = chr(ord(self.columns) + direction)
-    
-    def update_jump(self, direction):
-        self.newrows = self.newrows + self.colour
-        self.newcolumns = chr(ord(self.newcolumns) + direction)
+
+    def can_queens_jump(self):
+        if self.colour == 1: array = white
+        else: array = black
+        can_jump_queens.clear()
+        for i in array:
+            if i.__class__.__name__ == "queen":
+                i.jump_possible()
 
     def jump_possible(self):
         side = 1
         for i in range(2):
             side = side*(-1)
             self.update(side)
-            m = self.new_position()
-            if m in board.keys():
-                k = board[m]
+            enemy_space = self.new_position()
+            if enemy_space in board.keys():
+                k = board[enemy_space]
                 if k != "" and k.colour != self.colour:
-                    self.update_jump(side)
-                    n = self.new_position()
-                    if n in board.keys(): 
-                        if board[n] == "":
+                    self.newrows = self.newrows + self.colour
+                    self.newcolumns = chr(ord(self.newcolumns) + side)
+                    empty_space = self.new_position()
+                    if empty_space in board.keys(): 
+                        if board[empty_space] == "":
                             #print(self, "can jump", side)
-                            can_jump.append([self, side, m, n])
+                            can_jump.append([self, enemy_space, empty_space])
                         #else:
                             #print("There's not an empty space")
                 #lse:
@@ -73,12 +79,12 @@ class piece:
                 if self.colour == 1: array = white
                 else: array = black
                 can_jump.clear()
-                bla = direction
+                can_jump_queens.clear()
                 for i in array:
                     i.jump_possible()
                 #print(can_jump)
-                if can_jump == []:
-                    self.update(bla)
+                if can_jump == [] and can_jump_queens == []:
+                    self.update(direction)
                     x = self.new_position()
                     if (x in board.keys() and board[x] == ""):
                         y = self.old_position()
@@ -88,7 +94,7 @@ class piece:
                         self.columns = self.newcolumns
                         self.is_queen
                         turn = turn*(-1)
-                        print(self, x)
+                        print(y, "to", x)
                     else:
                         print("Toto políčko neexistuje nebo je obsazené.")
                 else:
@@ -98,39 +104,40 @@ class piece:
         else:
             print("Nejsi na tahu.")
 
-    def take(self, direction):
+    def jump(self, goal_empty_space): #zadat, kam chce skončit
         global turn
         if turn == self.colour:
             if self in board.values():
-                can_jump.clear()
-                self.jump_possible()
-                for i in can_jump:
-                    if self in i:
-                        if direction == i[1]:
-                            if self.colour == 1: array = black
-                            else: array = white
-                            array.remove(board[i[2]])
-                            print([str(obj) for obj in array])
-                            board[i[3]] = self
-                            board[i[2]] = ""
-                            y = self.old_position()
-                            board[y] = ""
-                            position = list(i[3])
-                            self.rows = int(position[0])
-                            self.columns = position[1]
-                            if self.is_queen() == True:
-                                break
-                            print(self, "takes", i[2])
-                            print(self, i[3])
-                            can_jump.clear()
-                            self.jump_possible()
-                            for i in can_jump:
-                                if self in i:
-                                    direction = int(input("Write in which direction should the piece jump: "))
+                self.can_queens_jump()
+                if can_jump_queens == []:
+                    self.jump_possible()
+                    for i in can_jump:
+                        if self in i:
+                            if goal_empty_space == i[2]:
+                                if self.colour == 1: array = black
+                                else: array = white
+                                array.remove(board[i[1]])
+                                print([str(obj) for obj in array])
+                                board[i[2]] = self
+                                board[i[1]] = ""
+                                y = self.old_position()
+                                board[y] = ""
+                                position = list(i[2])
+                                self.rows = int(position[0])
+                                self.columns = position[1]
+                                print(y, "takes", i[1])
+                                print(y, "to", i[2])
+                                if self.is_queen() == True:
                                     break
-                            self.take(direction)
-                            turn = turn*(-1)
-                            break
+                                can_jump.clear()
+                                self.jump_possible()
+                                for i in can_jump:
+                                    if self in i:
+                                        goal_empty_space = input("Write to which space would you like to jump: ")
+                                        break
+                                self.jump(goal_empty_space)
+                                turn = turn*(-1)
+                                break
                 
                         else:
                             print("no") 
@@ -144,6 +151,9 @@ class queen(piece):
         #direction = [number, horizontal, vertical]
         super().move(direction)
 
+    def jump(self, goal_empty_space):
+        super().jump(goal_empty_space)
+
     def is_queen(self):
         pass
 
@@ -153,6 +163,25 @@ class queen(piece):
         vertical = direction[2]
         self.newrows = self.rows + number*vertical     
         self.newcolumns = chr(ord(self.columns) + number*horizontal)
+    
+    def jump_possible(self):
+        x = self.old_position()
+        for diagonal in diagonals:
+            if x in diagonal:
+                for space in diagonal:
+                    if space != x:
+                        k = board[space] 
+                        if k != "" and k.colour != self.colour:
+                            enemy_space_index = diagonal.index(space)
+                            my_space_index = diagonal.index(x)
+                            if enemy_space_index < my_space_index: way = -1
+                            else: way = 1
+                            empty_space_index = enemy_space_index + way
+                            if empty_space_index>-1 and empty_space_index<(len(diagonal)-1):
+                                empty_space = diagonal[empty_space_index]
+                                if board[empty_space] == "":
+                                    enemy_space = diagonal[enemy_space_index]
+                                    can_jump_queens.append([self, enemy_space, empty_space])
         
         
 W1 = piece(1,"W1",1,"A")
@@ -192,10 +221,12 @@ board = {
     "8B" : B9, "8D" : B10, "8F" : B11, "8H" : B12,
     }
 
+diagonals = [["7A", "8B"],["5A", "6B", "7C", "8D"],["3A","4B","5C","6D","7E","8F"],["1A", "2B", "3C", "4D", "5E", "6F", "7G", "8H"], ["1C", "2D", "3E", "4F", "5G", "6H"], ["1E", "2F", "3G", "4H"], ["1G", "2H"], ["3A", "2B", "1C"], ["5A", "4B", "3C", "2D", "1E"], ["7A", "6B", "5C", "4D", "3E", "2F", "1G"], ["8B", "7C", "6D", "5E", "4F", "3G" ,"2H"], ["8D", "7E", "6F", "5G", "4H"], ["8F", "7G", "6H"]]
+
 black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
 white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
-black_queens = []
-white_queens = []
+#black_queens = []
+#white_queens = []
 
 
 W12.move(-1)
@@ -205,6 +236,7 @@ B5.move(1)
 W4.move(1)
 B2.move(-1)
 W11.move(-1)
-B2.take(1)
+B2.jump("3E")
 W8.move(1)
-B2.move([3, -1, 1])
+B2.move([2, -1, 1])
+B2.jump_possible()
