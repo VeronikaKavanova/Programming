@@ -15,6 +15,13 @@ turn = 1
 can_jump = []
 can_jump_queens = []
 
+
+def end_of_game():
+    if turn == 1: array = white
+    else: array = black
+    if array == []:
+        print(array, "lost, because they don't have any more pieces.")
+
 class piece:
     
     def __init__(self, colour, name, rows, columns):
@@ -73,6 +80,7 @@ class piece:
     
     def move(self, direction):
         global turn
+        end_of_game()
         if turn == self.colour:
             if self in board.values():
                 if self.colour == 1: array = white
@@ -92,8 +100,8 @@ class piece:
                         self.rows = self.newrows
                         self.columns = self.newcolumns
                         self.is_queen
-                        turn = turn*(-1)
                         print(self, y, "to", x)
+                        turn = turn*(-1)
                     else:
                         print("Toto políčko neexistuje nebo je obsazené.")
                 else:
@@ -105,6 +113,7 @@ class piece:
 
     def jump(self, goal_empty_space): #zadat, kam chce skončit
         global turn
+        end_of_game()
         if turn == self.colour:
             if self in board.values():
                 can_jump_queens.clear()
@@ -130,32 +139,36 @@ class piece:
                                 self.columns = position[1]
                                 print(self, y, "takes", i[1])
                                 print(self, y, "to", i[2])
+                                turn = turn*(-1)
                                 if self.is_queen() == True:
                                     break
                                 can_jump.clear()
+                                can_jump_queens.clear()
                                 self.jump_possible()
-                                for i in can_jump:
+                                if self.__class__.__name__ == "queen": jumping_possibilities = can_jump_queens
+                                else: jumping_possibilities = can_jump 
+                                for i in jumping_possibilities:
                                     if self in i:
                                         goal_empty_space = input("Write to which space would you like to jump: ")
-                                        break
-                                self.jump(goal_empty_space)
-                                turn = turn*(-1)
+                                        turn = turn*(-1)
+                                        self.jump(goal_empty_space)
                                 break
-                
+                            #else:
+                                #print("You can't jump there,")
+                        else:
+                            print("This piece can't jump.")
                 else:
                     print("A queen can jump") 
+            else:
+                print("This piece doesn't exist.")        
+        else:
+            print("It's not your turn")
+
 
     def __str__(self):
         return f"{self.name}"
 
 class queen(piece):
-    
-    def move(self, direction):
-        #direction = [number, horizontal, vertical]
-        super().move(direction)
-
-    def jump(self, goal_empty_space):
-        super().jump(goal_empty_space)
 
     def is_queen(self):
         pass
@@ -183,11 +196,15 @@ class queen(piece):
                             if enemy_space_index < my_space_index: way = -1
                             else: way = 1
                             empty_space_index = enemy_space_index + way
-                            if empty_space_index>-1 and empty_space_index<(len(diagonal)-1):
+                            if empty_space_index>-1 and empty_space_index<(len(diagonal)):
                                 empty_space = diagonal[empty_space_index]
                                 if board[empty_space] == "":
                                     enemy_space = diagonal[enemy_space_index]
                                     can_jump_queens.append([self, enemy_space, empty_space])
+                                #else:
+                                    #print("This space isn't empty.")
+                            #else:
+                                #print("This space doesn't exist.")
         
         
 W1 = piece(1,"W1",1,"A")
@@ -247,3 +264,10 @@ W8.move(1)
 B2.move([2, -1, 1])
 W10.move(-1)
 B2.jump("5G")
+W3.move(1)
+B1.jump("3C")
+W9.move(1)
+B1.jump("5A")
+W2.move(1)
+B1.jump("1E")
+W4.jump("4F")
