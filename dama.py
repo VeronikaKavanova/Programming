@@ -1,4 +1,4 @@
-import pygame
+#import pygame
 
 #postup jak na git
 #git add .
@@ -271,3 +271,12 @@ B1.jump("5A")
 W2.move(1)
 B1.jump("1E")
 W4.jump("4F")
+B2.jump("3E")
+W8.move(-1)
+B4.jump("4F")
+W5.move(1)
+B2.move([1,-1,-1])
+W1.move(1)
+B2.jump("4B")
+W1.move(1)
+B2.jump("2D")
