@@ -15,12 +15,15 @@ turn = 1
 can_jump = []
 can_jump_queens = []
 
-
 def end_of_game():
-    if turn == 1: array = white
-    else: array = black
+    if turn == 1: 
+        array = white
+        name = "white"
+    else: 
+        array = black
+        name = "black"
     if array == []:
-        print(array, "lost, because they don't have any more pieces.")
+        print(name, "lost, because they don't have any more pieces.")
 
 class piece:
     
@@ -80,7 +83,6 @@ class piece:
     
     def move(self, direction):
         global turn
-        end_of_game()
         if turn == self.colour:
             if self in board.values():
                 if self.colour == 1: array = white
@@ -102,6 +104,7 @@ class piece:
                         self.is_queen
                         print(self, y, "to", x)
                         turn = turn*(-1)
+                        end_of_game()
                     else:
                         print("Toto políčko neexistuje nebo je obsazené.")
                 else:
@@ -113,7 +116,6 @@ class piece:
 
     def jump(self, goal_empty_space): #zadat, kam chce skončit
         global turn
-        end_of_game()
         if turn == self.colour:
             if self in board.values():
                 can_jump_queens.clear()
@@ -140,6 +142,7 @@ class piece:
                                 print(self, y, "takes", i[1])
                                 print(self, y, "to", i[2])
                                 turn = turn*(-1)
+                                end_of_game()
                                 if self.is_queen() == True:
                                     break
                                 can_jump.clear()
