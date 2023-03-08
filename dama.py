@@ -11,11 +11,17 @@ import pygame
 #kdyz poprve nova vetev. git push --set-upstream origin pokus
 #git push
 
+screen = pygame.display.set_mode()
+
+running = True
+
 turn = 1
 can_jump = []
 can_jump_queens = []
+game = True
 
 def end_of_game():
+    global game
     if turn == 1: 
         array = white
         name = "white"
@@ -23,8 +29,9 @@ def end_of_game():
         array = black
         name = "black"
     if array == []:
+        game = False
         print(name, "lost, because they don't have any more pieces.")
-
+            
 class piece:
     
     def __init__(self, colour, name, rows, columns):
@@ -83,90 +90,95 @@ class piece:
     
     def move(self, direction):
         global turn
-        if turn == self.colour:
-            if self in board.values():
-                if self.colour == 1: array = white
-                else: array = black
-                can_jump.clear()
-                can_jump_queens.clear()
-                for i in array:
-                    i.jump_possible()
-                #print(can_jump)
-                if can_jump == [] and can_jump_queens == []:
-                    self.update(direction)
-                    x = self.new_position()
-                    if (x in board.keys() and board[x] == ""):
-                        y = self.old_position()
-                        board[x] = self
-                        board[y] = ""
-                        self.rows = self.newrows
-                        self.columns = self.newcolumns
-                        self.is_queen
-                        print(self, y, "to", x)
-                        turn = turn*(-1)
-                        end_of_game()
+        if game == True: 
+            if turn == self.colour:
+                if self in board.values():
+                    if self.colour == 1: array = white
+                    else: array = black
+                    can_jump.clear()
+                    can_jump_queens.clear()
+                    for i in array:
+                        i.jump_possible()
+                    #print(can_jump)
+                    if can_jump == [] and can_jump_queens == []:
+                        self.update(direction)
+                        x = self.new_position()
+                        if (x in board.keys() and board[x] == ""):
+                            y = self.old_position()
+                            board[x] = self
+                            board[y] = ""
+                            self.rows = self.newrows
+                            self.columns = self.newcolumns
+                            self.is_queen
+                            print(self, y, "to", x)
+                            turn = turn*(-1)
+                            end_of_game()
+                        else:
+                            print("Toto políčko neexistuje nebo je obsazené.")
                     else:
-                        print("Toto políčko neexistuje nebo je obsazené.")
+                        print("Someone can jump.")
                 else:
-                    print("Someone can jump.")
+                    print("Tato figurka již neexistuje.")
             else:
-                print("Tato figurka již neexistuje.")
+                print("Nejsi na tahu.")
         else:
-            print("Nejsi na tahu.")
+            print("The game is over.")
 
     def jump(self, goal_empty_space): #zadat, kam chce skončit
         global turn
-        if turn == self.colour:
-            if self in board.values():
-                can_jump_queens.clear()
-                self.can_queens_jump()
-                if can_jump_queens == []:
-                    can_jump.clear()
-                    self.jump_possible()
-                    if self.__class__.__name__ == "queen": jumping_possibilities = can_jump_queens
-                    else: jumping_possibilities = can_jump 
-                    for i in jumping_possibilities:
-                        if self in i:
-                            if goal_empty_space == i[2]:
-                                if self.colour == 1: array = black
-                                else: array = white
-                                array.remove(board[i[1]])
-                                print([str(obj) for obj in array])
-                                board[i[2]] = self
-                                board[i[1]] = ""
-                                y = self.old_position()
-                                board[y] = ""
-                                position = list(i[2])
-                                self.rows = int(position[0])
-                                self.columns = position[1]
-                                print(self, y, "takes", i[1])
-                                print(self, y, "to", i[2])
-                                turn = turn*(-1)
-                                end_of_game()
-                                if self.is_queen() == True:
+        if game == True:
+            if turn == self.colour:
+                if self in board.values():
+                    can_jump_queens.clear()
+                    self.can_queens_jump()
+                    if can_jump_queens == []:
+                        can_jump.clear()
+                        self.jump_possible()
+                        if self.__class__.__name__ == "queen": jumping_possibilities = can_jump_queens
+                        else: jumping_possibilities = can_jump 
+                        for i in jumping_possibilities:
+                            if self in i:
+                                if goal_empty_space == i[2]:
+                                    if self.colour == 1: array = black
+                                    else: array = white
+                                    array.remove(board[i[1]])
+                                    print([str(obj) for obj in array])
+                                    board[i[2]] = self
+                                    board[i[1]] = ""
+                                    y = self.old_position()
+                                    board[y] = ""
+                                    position = list(i[2])
+                                    self.rows = int(position[0])
+                                    self.columns = position[1]
+                                    print(self, y, "takes", i[1])
+                                    print(self, y, "to", i[2])
+                                    turn = turn*(-1)
+                                    end_of_game()
+                                    if self.is_queen() == True:
+                                        break
+                                    can_jump.clear()
+                                    can_jump_queens.clear()
+                                    self.jump_possible()
+                                    if self.__class__.__name__ == "queen": jumping_possibilities = can_jump_queens
+                                    else: jumping_possibilities = can_jump 
+                                    for i in jumping_possibilities:
+                                        if self in i:
+                                            goal_empty_space = input("Write to which space would you like to jump: ")
+                                            turn = turn*(-1)
+                                            self.jump(goal_empty_space)
                                     break
-                                can_jump.clear()
-                                can_jump_queens.clear()
-                                self.jump_possible()
-                                if self.__class__.__name__ == "queen": jumping_possibilities = can_jump_queens
-                                else: jumping_possibilities = can_jump 
-                                for i in jumping_possibilities:
-                                    if self in i:
-                                        goal_empty_space = input("Write to which space would you like to jump: ")
-                                        turn = turn*(-1)
-                                        self.jump(goal_empty_space)
-                                break
-                            #else:
-                                #print("You can't jump there,")
-                        else:
-                            print("This piece can't jump.")
+                                #else:
+                                    #print("You can't jump there,")
+                            else:
+                                print("This piece can't jump.")
+                    else:
+                        print("A queen can jump") 
                 else:
-                    print("A queen can jump") 
+                    print("This piece doesn't exist.")        
             else:
-                print("This piece doesn't exist.")        
+                print("It's not your turn")
         else:
-            print("It's not your turn")
-
+            print("The game is over.")
 
     def __str__(self):
         return f"{self.name}"
@@ -209,7 +221,13 @@ class queen(piece):
                             #else:
                                 #print("This space doesn't exist.")
         
-        
+while game:
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+
 W1 = piece(1,"W1",1,"A")
 W2 = piece(1,"W2",1,"C")
 W3 = piece(1,"W3",1,"E")
