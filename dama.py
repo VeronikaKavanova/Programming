@@ -11,7 +11,7 @@ import pygame
 #kdyz poprve nova vetev. git push --set-upstream origin pokus
 #git push
 
-screen = pygame.display.set_mode()
+#screen = pygame.display.set_mode()
 
 running = True
 
@@ -31,7 +31,24 @@ def end_of_game():
     if array == []:
         game = False
         print(name, "lost, because they don't have any more pieces.")
-            
+    else: 
+        can_jump.clear()
+        can_jump_queens.clear()
+        for i in array:
+            i.jump_possible()
+        if can_jump == [] and can_jump_queens == []:
+            for i in array:
+                if i.__class__.__name__ == "queen": 
+                    pass
+                else:                        
+                    side = 1
+                    for j in range(2):
+                        side = side*(-1)
+                        i.update(side)
+                        x = i.new_position()
+                        if (x in board.keys() and board[x] == ""):
+                            return True
+
 class piece:
     
     def __init__(self, colour, name, rows, columns):
@@ -43,9 +60,6 @@ class piece:
     def is_queen(self):
         if self.rows == (4.5+3.5*self.colour):
             self.__class__ = queen
-            #if self.colour == 1: array = white_queens
-            #else: array = black_queens
-            #array.append(self)
             return True
     
     def old_position(self):
@@ -208,24 +222,32 @@ class queen(piece):
                         if k != "" and k.colour != self.colour:
                             enemy_space_index = diagonal.index(space)
                             my_space_index = diagonal.index(x)
-                            if enemy_space_index < my_space_index: way = -1
-                            else: way = 1
-                            empty_space_index = enemy_space_index + way
-                            if empty_space_index>-1 and empty_space_index<(len(diagonal)):
+                            enemy_space = diagonal[enemy_space_index]
+                            if enemy_space_index < my_space_index: 
+                                way = -1 
+                                number_of_spaces = enemy_space_index
+                            else: 
+                                way = 1
+                                number_of_spaces = len(diagonal) - enemy_space_index - 1
+                            empty_space_index = enemy_space_index
+                            for i in range(number_of_spaces):
+                                empty_space_index = empty_space_index + way
+                            #if empty_space_index>-1 and empty_space_index<(len(diagonal)):
                                 empty_space = diagonal[empty_space_index]
                                 if board[empty_space] == "":
-                                    enemy_space = diagonal[enemy_space_index]
                                     can_jump_queens.append([self, enemy_space, empty_space])
+                                else:
+                                    break
                                 #else:
                                     #print("This space isn't empty.")
                             #else:
                                 #print("This space doesn't exist.")
         
-while game:
+#while game:
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+#    for event in pygame.event.get():
+#        if event.type == pygame.QUIT:
+#            running = False
 
 
 W1 = piece(1,"W1",1,"A")
@@ -281,23 +303,26 @@ W4.move(1)
 B2.move(-1)
 W11.move(-1)
 B2.jump("3E")
-W8.move(1)
-B2.move([2, -1, 1])
-W10.move(-1)
-B2.jump("5G")
-W3.move(1)
-B1.jump("3C")
-W9.move(1)
-B1.jump("5A")
-W2.move(1)
-B1.jump("1E")
-W4.jump("4F")
-B2.jump("3E")
-W8.move(-1)
-B4.jump("4F")
-W5.move(1)
-B2.move([1,-1,-1])
-W1.move(1)
-B2.jump("4B")
-W1.move(1)
-B2.jump("2D")
+W6.move(1)
+B2.jump("4D")
+
+#W8.move(1)
+#B2.move([2, -1, 1])
+#W10.move(-1)
+#B2.jump("5G")
+#W3.move(1)
+#B1.jump("3C")
+#W9.move(1)
+#B1.jump("5A")
+#W2.move(1)
+#B1.jump("1E")
+#W4.jump("4F")
+#B2.jump("3E")
+#W8.move(-1)
+#B4.jump("4F")
+#W5.move(1)
+#B2.move([1,-1,-1])
+#W1.move(1)
+#B2.jump("4B")
+#W1.move(1)
+#B2.jump("2D")
