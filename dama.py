@@ -1,4 +1,4 @@
-#import pygame
+import pygame
 
 #postup jak na git
 #git add .
