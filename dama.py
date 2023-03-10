@@ -39,7 +39,14 @@ def end_of_game():
         if can_jump == [] and can_jump_queens == []:
             for i in array:
                 if i.__class__.__name__ == "queen": 
-                    pass
+                    x = i.old_position()
+                    for diagonal in diagonals:
+                        if x in diagonal:
+                            for space in diagonal:
+                                if space != x:
+                                    k = board[space]
+                                    if k == "":
+                                        return True
                 else:                        
                     side = 1
                     for j in range(2):
@@ -48,6 +55,8 @@ def end_of_game():
                         x = i.new_position()
                         if (x in board.keys() and board[x] == ""):
                             return True
+            game = False
+            print(name, "lost, because none of their pieces can move.")
 
 class piece:
     
@@ -303,26 +312,23 @@ W4.move(1)
 B2.move(-1)
 W11.move(-1)
 B2.jump("3E")
-W6.move(1)
-B2.jump("4D")
-
-#W8.move(1)
-#B2.move([2, -1, 1])
-#W10.move(-1)
-#B2.jump("5G")
-#W3.move(1)
-#B1.jump("3C")
-#W9.move(1)
-#B1.jump("5A")
-#W2.move(1)
-#B1.jump("1E")
-#W4.jump("4F")
-#B2.jump("3E")
-#W8.move(-1)
-#B4.jump("4F")
-#W5.move(1)
-#B2.move([1,-1,-1])
-#W1.move(1)
-#B2.jump("4B")
-#W1.move(1)
-#B2.jump("2D")
+W8.move(1)
+B2.move([2, -1, 1])
+W10.move(-1)
+B2.jump("5G")
+W3.move(1)
+B1.jump("3C")
+W9.move(1)
+B1.jump("5A")
+W2.move(1)
+B1.jump("1E")
+W4.jump("4F")
+B2.jump("3E") 
+W5.move(1)
+B4.move(-1)
+W1.move(1)
+B2.move([1,1,1])
+W5.move(1)
+B2.move([1,-1,1])
+W1.move(1)
+B2.jump("2B")
