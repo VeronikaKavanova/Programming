@@ -258,72 +258,43 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 chessboard = pygame.image.load("chessboard.jpg").convert()
 
-space_8B = pygame.image.load("Policko_test.jpg").convert()
-space_8D = pygame.image.load("Policko_test.jpg").convert()
-space_8F = pygame.image.load("Policko_test.jpg").convert()
-space_8H = pygame.image.load("Policko_test.jpg").convert()
-space_7A = pygame.image.load("Policko_test.jpg").convert()
-space_7C = pygame.image.load("Policko_test.jpg").convert()
-space_7E = pygame.image.load("Policko_test.jpg").convert()
-space_7G = pygame.image.load("Policko_test.jpg").convert()
-space_6B = pygame.image.load("Policko_test.jpg").convert()
-space_6D = pygame.image.load("Policko_test.jpg").convert()
-space_6F = pygame.image.load("Policko_test.jpg").convert()
-space_6H = pygame.image.load("Policko_test.jpg").convert()
-space_5A = pygame.image.load("Policko_test.jpg").convert()
-space_5C = pygame.image.load("Policko_test.jpg").convert()
-space_5E = pygame.image.load("Policko_test.jpg").convert()
-space_5G = pygame.image.load("Policko_test.jpg").convert()
-space_4B = pygame.image.load("Policko_test.jpg").convert()
-space_4D = pygame.image.load("Policko_test.jpg").convert()
-space_4F = pygame.image.load("Policko_test.jpg").convert()
-space_4H = pygame.image.load("Policko_test.jpg").convert()
-space_3A = pygame.image.load("Policko_test.jpg").convert()
-space_3C = pygame.image.load("Policko_test.jpg").convert()
-space_3E = pygame.image.load("Policko_test.jpg").convert()
-space_3G = pygame.image.load("Policko_test.jpg").convert()
-space_2B = pygame.image.load("Policko_test.jpg").convert()
-space_2D = pygame.image.load("Policko_test.jpg").convert()
-space_2F = pygame.image.load("Policko_test.jpg").convert()
-space_2H = pygame.image.load("Policko_test.jpg").convert()
-space_1A = pygame.image.load("Policko_test.jpg").convert()
-space_1C = pygame.image.load("Policko_test.jpg").convert()
-space_1E = pygame.image.load("Policko_test.jpg").convert()
-space_1G = pygame.image.load("Policko_test.jpg").convert()
+space_8B = pygame.image.load("Policko.jpg").convert()
+space_8D = pygame.image.load("Policko.jpg").convert()
+space_8F = pygame.image.load("Policko.jpg").convert()
+space_8H = pygame.image.load("Policko.jpg").convert()
+space_7A = pygame.image.load("Policko.jpg").convert()
+space_7C = pygame.image.load("Policko.jpg").convert()
+space_7E = pygame.image.load("Policko.jpg").convert()
+space_7G = pygame.image.load("Policko.jpg").convert()
+space_6B = pygame.image.load("Policko.jpg").convert()
+space_6D = pygame.image.load("Policko.jpg").convert()
+space_6F = pygame.image.load("Policko.jpg").convert()
+space_6H = pygame.image.load("Policko.jpg").convert()
+space_5A = pygame.image.load("Policko.jpg").convert()
+space_5C = pygame.image.load("Policko.jpg").convert()
+space_5E = pygame.image.load("Policko.jpg").convert()
+space_5G = pygame.image.load("Policko.jpg").convert()
+space_4B = pygame.image.load("Policko.jpg").convert()
+space_4D = pygame.image.load("Policko.jpg").convert()
+space_4F = pygame.image.load("Policko.jpg").convert()
+space_4H = pygame.image.load("Policko.jpg").convert()
+space_3A = pygame.image.load("Policko.jpg").convert()
+space_3C = pygame.image.load("Policko.jpg").convert()
+space_3E = pygame.image.load("Policko.jpg").convert()
+space_3G = pygame.image.load("Policko.jpg").convert()
+space_2B = pygame.image.load("Policko.jpg").convert()
+space_2D = pygame.image.load("Policko.jpg").convert()
+space_2F = pygame.image.load("Policko.jpg").convert()
+space_2H = pygame.image.load("Policko.jpg").convert()
+space_1A = pygame.image.load("Policko.jpg").convert()
+space_1C = pygame.image.load("Policko.jpg").convert()
+space_1E = pygame.image.load("Policko.jpg").convert()
+space_1G = pygame.image.load("Policko.jpg").convert()
 
 spaces = [space_8B, space_8D, space_8F, space_8H, space_7A, space_7C, space_7E, space_7G, 
           space_6B, space_6D, space_6F, space_6H, space_5A, space_5C, space_5E, space_5G, 
           space_4B, space_4D, space_4F, space_4H, space_3A, space_3C, space_3E, space_3G, 
           space_2B, space_2D, space_2F, space_2H, space_1A, space_1C, space_1E, space_1G]
-
-
-
-
-
-#chessboard.blit(space_8B, (123,61))
-#chessboard.blit(space_8D, (244,61))
-#chessboard.blit(space_8H, (484,61))
-#chessboard.blit(space_7
-#chessboard.blit(space_7
-#chessboard.blit(space_7
-#chessboard.blit(space_6
-#chessboard.blit(space_6D
-#chessboard.blit(space_6F
-#chessboard.blit(space_6H
-#chessboard.blit(space_5A
-#chessboard.blit(space_5C
-#chessboard.blit(space_5E
-#chessboard.blit(space_5G
-#chessboard.blit(space_4B
-#chessboard.blit(space_4D
-#chessboard.blit(space_4F                
-#chessboard.blit(space_4H
-#chessboard.blit(space_3A
-#chessboard.blit(space_3C
-#chessboard.blit(space_3E                
-#chessboard.blit(space_3G
-
-
 
 running = True
 
