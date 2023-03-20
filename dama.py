@@ -12,6 +12,13 @@ from pygame.locals import (
 #git commit -m "smyslnuplna zprava"
 #git push
 
+pygame.init()
+
+screen_width = 1200
+screen_height = 650
+
+screen = pygame.display.set_mode((screen_width, screen_height))
+
 turn = 1
 can_jump = []
 can_jump_queens = []
@@ -62,7 +69,11 @@ class piece:
         self.colour = colour
         self.rows = rows
         self.columns = columns
-        #self.surf = 
+        if self.colour == 1:
+            self.surf = pygame.image.load("WPiece.png").convert()
+        else:
+            self.surf = pygame.image.load("BPiece.png").convert()
+        self.rect = self.surf.get_rect()
 
     def is_queen(self):
         if self.rows == (4.5+3.5*self.colour):
@@ -250,12 +261,47 @@ class queen(piece):
                             #else:
                                 #print("This space doesn't exist.")
 
-pygame.init()
+W1 = piece(1,"W1",1,"A")
+W2 = piece(1,"W2",1,"C")
+W3 = piece(1,"W3",1,"E")
+W4 = piece(1,"W4",1,"G")
+W5 = piece(1,"W5",2,"B")
+W6 = piece(1,"W6",2,"D")
+W7 = piece(1,"W7",2,"F")
+W8 = piece(1,"W8",2,"H")
+W9 = piece(1,"W9",3,"A")
+W10 = piece(1,"W10",3,"C")
+W11 = piece(1,"W11",3,"E")
+W12 = piece(1,"W12",3,"G")
 
-screen_width = 1200
-screen_height = 650
+B1 = piece(-1,"B1",6,"B")
+B2 = piece(-1,"B2",6,"D")
+B3 = piece(-1,"B3",6,"F")
+B4 = piece(-1,"B4",6,"H")
+B5 = piece(-1,"B5",7,"A")
+B6 = piece(-1,"B6",7,"C")
+B7 = piece(-1,"B7",7,"E")
+B8 = piece(-1,"B8",7,"G")
+B9 = piece(-1,"B9",8,"B")
+B10 = piece(-1,"B10",8,"D")
+B11 = piece(-1,"B11",8,"F")
+B12 = piece(-1,"B12",8,"H")
 
-screen = pygame.display.set_mode((screen_width, screen_height))
+board = {
+    "1A" : W1, "1C" : W2, "1E" : W3, "1G" : W4,
+    "2B" : W5, "2D" : W6, "2F" : W7, "2H" : W8,
+    "3A" : W9, "3C" : W10, "3E" : W11, "3G" : W12,
+    "4B" : "", "4D" : "", "4F" : "", "4H" : "",
+    "5A" : "", "5C" : "", "5E" : "", "5G" : "",
+    "6B" : B1, "6D" : B2, "6F" : B3, "6H" : B4,
+    "7A" : B5, "7C" : B6, "7E" : B7, "7G" : B8,
+    "8B" : B9, "8D" : B10, "8F" : B11, "8H" : B12,
+    }
+
+diagonals = [["7A", "8B"],["5A", "6B", "7C", "8D"],["3A","4B","5C","6D","7E","8F"],["1A", "2B", "3C", "4D", "5E", "6F", "7G", "8H"], ["1C", "2D", "3E", "4F", "5G", "6H"], ["1E", "2F", "3G", "4H"], ["1G", "2H"], ["3A", "2B", "1C"], ["5A", "4B", "3C", "2D", "1E"], ["7A", "6B", "5C", "4D", "3E", "2F", "1G"], ["8B", "7C", "6D", "5E", "4F", "3G" ,"2H"], ["8D", "7E", "6F", "5G", "4H"], ["8F", "7G", "6H"]]
+
+black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
+white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
 
 chessboard = pygame.image.load("chessboard.jpg").convert()
 
@@ -321,49 +367,9 @@ while running:
                 x += 122
             y += 61.5
 
+    space_1A.blit(W1, (90, 150))
+
     pygame.display.flip()
-
-W1 = piece(1,"W1",1,"A")
-W2 = piece(1,"W2",1,"C")
-W3 = piece(1,"W3",1,"E")
-W4 = piece(1,"W4",1,"G")
-W5 = piece(1,"W5",2,"B")
-W6 = piece(1,"W6",2,"D")
-W7 = piece(1,"W7",2,"F")
-W8 = piece(1,"W8",2,"H")
-W9 = piece(1,"W9",3,"A")
-W10 = piece(1,"W10",3,"C")
-W11 = piece(1,"W11",3,"E")
-W12 = piece(1,"W12",3,"G")
-
-B1 = piece(-1,"B1",6,"B")
-B2 = piece(-1,"B2",6,"D")
-B3 = piece(-1,"B3",6,"F")
-B4 = piece(-1,"B4",6,"H")
-B5 = piece(-1,"B5",7,"A")
-B6 = piece(-1,"B6",7,"C")
-B7 = piece(-1,"B7",7,"E")
-B8 = piece(-1,"B8",7,"G")
-B9 = piece(-1,"B9",8,"B")
-B10 = piece(-1,"B10",8,"D")
-B11 = piece(-1,"B11",8,"F")
-B12 = piece(-1,"B12",8,"H")
-
-board = {
-    "1A" : W1, "1C" : W2, "1E" : W3, "1G" : W4,
-    "2B" : W5, "2D" : W6, "2F" : W7, "2H" : W8,
-    "3A" : W9, "3C" : W10, "3E" : W11, "3G" : W12,
-    "4B" : "", "4D" : "", "4F" : "", "4H" : "",
-    "5A" : "", "5C" : "", "5E" : "", "5G" : "",
-    "6B" : B1, "6D" : B2, "6F" : B3, "6H" : B4,
-    "7A" : B5, "7C" : B6, "7E" : B7, "7G" : B8,
-    "8B" : B9, "8D" : B10, "8F" : B11, "8H" : B12,
-    }
-
-diagonals = [["7A", "8B"],["5A", "6B", "7C", "8D"],["3A","4B","5C","6D","7E","8F"],["1A", "2B", "3C", "4D", "5E", "6F", "7G", "8H"], ["1C", "2D", "3E", "4F", "5G", "6H"], ["1E", "2F", "3G", "4H"], ["1G", "2H"], ["3A", "2B", "1C"], ["5A", "4B", "3C", "2D", "1E"], ["7A", "6B", "5C", "4D", "3E", "2F", "1G"], ["8B", "7C", "6D", "5E", "4F", "3G" ,"2H"], ["8D", "7E", "6F", "5G", "4H"], ["8F", "7G", "6H"]]
-
-black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
-white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
 
 #W12.move(-1)
 #B1.move(-1)
