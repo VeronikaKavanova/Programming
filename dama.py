@@ -62,6 +62,7 @@ class piece:
         self.colour = colour
         self.rows = rows
         self.columns = columns
+        #self.surf = 
 
     def is_queen(self):
         if self.rows == (4.5+3.5*self.colour):
