@@ -296,20 +296,13 @@ spaces = [space_8B, space_8D, space_8F, space_8H, space_7A, space_7C, space_7E, 
           space_4B, space_4D, space_4F, space_4H, space_3A, space_3C, space_3E, space_3G, 
           space_2B, space_2D, space_2F, space_2H, space_1A, space_1C, space_1E, space_1G]
 
-screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
 
-#for space in spaces:
-#    y = 61
-#    for j in range(8):
-#        x = 124
-#        for k in range(4):
-#            chessboard.blit(space, (x,y))
-#            x += 120
-#        y += 60
 
-chessboard.blit(space_8B, (123,61))
-chessboard.blit(space_8D, (244,61))
-chessboard.blit(space_8H, (484,61))
+
+
+#chessboard.blit(space_8B, (123,61))
+#chessboard.blit(space_8D, (244,61))
+#chessboard.blit(space_8H, (484,61))
 #chessboard.blit(space_7
 #chessboard.blit(space_7
 #chessboard.blit(space_7
@@ -330,7 +323,7 @@ chessboard.blit(space_8H, (484,61))
 #chessboard.blit(space_3E                
 #chessboard.blit(space_3G
 
-pygame.display.flip()
+
 
 running = True
 
@@ -341,6 +334,22 @@ while running:
             running = False
 
     screen.fill((255,255,255))
+    screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
+    for space in spaces:
+        y = 61
+        for j in range(4):
+            x = 124
+            for k in range(4):
+                chessboard.blit(space, (x,y))
+                x += 122
+            y += 61.5
+            x = 64
+            for k in range(4):
+                chessboard.blit(space, (x,y))
+                x += 122
+            y += 61.5
+
+    pygame.display.flip()
 
 W1 = piece(1,"W1",1,"A")
 W2 = piece(1,"W2",1,"C")
