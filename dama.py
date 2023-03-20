@@ -11,10 +11,6 @@ import pygame
 #kdyz poprve nova vetev. git push --set-upstream origin pokus
 #git push
 
-#screen = pygame.display.set_mode()
-
-running = True
-
 turn = 1
 can_jump = []
 can_jump_queens = []
@@ -251,12 +247,21 @@ class queen(piece):
                                     #print("This space isn't empty.")
                             #else:
                                 #print("This space doesn't exist.")
-        
-#while game:
 
-#    for event in pygame.event.get():
-#        if event.type == pygame.QUIT:
-#            running = False
+pygame.init()
+
+screen_width = 1200
+screen_height = 700
+
+screen = pygame.display.set_mode((screen_width, screen_height))
+
+running = True
+
+while running:
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
 
 W1 = piece(1,"W1",1,"A")
