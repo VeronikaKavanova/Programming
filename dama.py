@@ -1,14 +1,15 @@
 import pygame
 
+from pygame.locals import (
+    RLEACCEL,
+    K_ESCAPE,
+    KEYDOWN,
+    QUIT,
+)
+
 #postup jak na git
 #git add .
 #git commit -m "smyslnuplna zprava"
-#git push
-
-#vice vetvi
-#git branch nova_vetev
-#git switch nazev_vetev
-#kdyz poprve nova vetev. git push --set-upstream origin pokus
 #git push
 
 turn = 1
@@ -251,9 +252,85 @@ class queen(piece):
 pygame.init()
 
 screen_width = 1200
-screen_height = 700
+screen_height = 650
 
 screen = pygame.display.set_mode((screen_width, screen_height))
+
+chessboard = pygame.image.load("chessboard.jpg").convert()
+
+space_8B = pygame.image.load("Policko_test.jpg").convert()
+space_8D = pygame.image.load("Policko_test.jpg").convert()
+space_8F = pygame.image.load("Policko_test.jpg").convert()
+space_8H = pygame.image.load("Policko_test.jpg").convert()
+space_7A = pygame.image.load("Policko_test.jpg").convert()
+space_7C = pygame.image.load("Policko_test.jpg").convert()
+space_7E = pygame.image.load("Policko_test.jpg").convert()
+space_7G = pygame.image.load("Policko_test.jpg").convert()
+space_6B = pygame.image.load("Policko_test.jpg").convert()
+space_6D = pygame.image.load("Policko_test.jpg").convert()
+space_6F = pygame.image.load("Policko_test.jpg").convert()
+space_6H = pygame.image.load("Policko_test.jpg").convert()
+space_5A = pygame.image.load("Policko_test.jpg").convert()
+space_5C = pygame.image.load("Policko_test.jpg").convert()
+space_5E = pygame.image.load("Policko_test.jpg").convert()
+space_5G = pygame.image.load("Policko_test.jpg").convert()
+space_4B = pygame.image.load("Policko_test.jpg").convert()
+space_4D = pygame.image.load("Policko_test.jpg").convert()
+space_4F = pygame.image.load("Policko_test.jpg").convert()
+space_4H = pygame.image.load("Policko_test.jpg").convert()
+space_3A = pygame.image.load("Policko_test.jpg").convert()
+space_3C = pygame.image.load("Policko_test.jpg").convert()
+space_3E = pygame.image.load("Policko_test.jpg").convert()
+space_3G = pygame.image.load("Policko_test.jpg").convert()
+space_2B = pygame.image.load("Policko_test.jpg").convert()
+space_2D = pygame.image.load("Policko_test.jpg").convert()
+space_2F = pygame.image.load("Policko_test.jpg").convert()
+space_2H = pygame.image.load("Policko_test.jpg").convert()
+space_1A = pygame.image.load("Policko_test.jpg").convert()
+space_1C = pygame.image.load("Policko_test.jpg").convert()
+space_1E = pygame.image.load("Policko_test.jpg").convert()
+space_1G = pygame.image.load("Policko_test.jpg").convert()
+
+spaces = [space_8B, space_8D, space_8F, space_8H, space_7A, space_7C, space_7E, space_7G, 
+          space_6B, space_6D, space_6F, space_6H, space_5A, space_5C, space_5E, space_5G, 
+          space_4B, space_4D, space_4F, space_4H, space_3A, space_3C, space_3E, space_3G, 
+          space_2B, space_2D, space_2F, space_2H, space_1A, space_1C, space_1E, space_1G]
+
+screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
+
+#for space in spaces:
+#    y = 61
+#    for j in range(8):
+#        x = 124
+#        for k in range(4):
+#            chessboard.blit(space, (x,y))
+#            x += 120
+#        y += 60
+
+chessboard.blit(space_8B, (123,61))
+chessboard.blit(space_8D, (244,61))
+chessboard.blit(space_8H, (484,61))
+#chessboard.blit(space_7
+#chessboard.blit(space_7
+#chessboard.blit(space_7
+#chessboard.blit(space_6
+#chessboard.blit(space_6D
+#chessboard.blit(space_6F
+#chessboard.blit(space_6H
+#chessboard.blit(space_5A
+#chessboard.blit(space_5C
+#chessboard.blit(space_5E
+#chessboard.blit(space_5G
+#chessboard.blit(space_4B
+#chessboard.blit(space_4D
+#chessboard.blit(space_4F                
+#chessboard.blit(space_4H
+#chessboard.blit(space_3A
+#chessboard.blit(space_3C
+#chessboard.blit(space_3E                
+#chessboard.blit(space_3G
+
+pygame.display.flip()
 
 running = True
 
@@ -263,6 +340,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    screen.fill((255,255,255))
 
 W1 = piece(1,"W1",1,"A")
 W2 = piece(1,"W2",1,"C")
@@ -305,35 +383,32 @@ diagonals = [["7A", "8B"],["5A", "6B", "7C", "8D"],["3A","4B","5C","6D","7E","8F
 
 black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
 white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
-#black_queens = []
-#white_queens = []
 
-
-W12.move(-1)
-B1.move(-1)
-W8.move(-1)
-B5.move(1)
-W4.move(1)
-B2.move(-1)
-W11.move(-1)
-B2.jump("3E")
-W8.move(1)
-B2.move([2, -1, 1])
-W10.move(-1)
-B2.jump("5G")
-W3.move(1)
-B1.jump("3C")
-W9.move(1)
-B1.jump("5A")
-W2.move(1)
-B1.jump("1E")
-W4.jump("4F")
-B2.jump("3E") 
-W5.move(1)
-B4.move(-1)
-W1.move(1)
-B2.move([1,1,1])
-W5.move(1)
-B2.move([1,-1,1])
-W1.move(1)
-B2.jump("2B")
+#W12.move(-1)
+#B1.move(-1)
+#W8.move(-1)
+#B5.move(1)
+#W4.move(1)
+#B2.move(-1)
+#W11.move(-1)
+#B2.jump("3E")
+#W8.move(1)
+#B2.move([2, -1, 1])
+#W10.move(-1)
+#B2.jump("5G")
+#W3.move(1)
+#B1.jump("3C")
+#W9.move(1)
+#B1.jump("5A")
+#W2.move(1)
+#B1.jump("1E")
+#W4.jump("4F")
+#B2.jump("3E") 
+#W5.move(1)
+#B4.move(-1)
+#W1.move(1)
+#B2.move([1,1,1])
+#W5.move(1)
+#B2.move([1,-1,1])
+#W1.move(1)
+#B2.jump("2B")
