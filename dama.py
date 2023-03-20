@@ -367,7 +367,7 @@ while running:
                 x += 122
             y += 61.5
 
-    space_1A.blit(W1, (90, 150))
+    chessboard.blit(W1.surf, (90, 150))
 
     pygame.display.flip()
 
