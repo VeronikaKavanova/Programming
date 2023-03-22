@@ -77,6 +77,13 @@ def end_of_game():
             game = False
             print(name, "lost, because none of their pieces can move.")
 
+class space():
+
+    def __init__(self, which_one):
+        self.surf = pygame.image.load("Policko.jpg").convert()
+        self.position = coordinates[which_one]
+        self.rect = pygame.Rect(self.position, (60,60))
+
 class piece:
     
     def __init__(self, colour, name, rows, columns):
@@ -255,6 +262,7 @@ class queen(piece):
         y = self.old_position
         for diagonal in diagonals:
             if y in diagonal:
+                x = self.new_position
                 if x in diagonal:
                     return True
 
@@ -340,38 +348,38 @@ white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
 
 chessboard = pygame.image.load("chessboard.jpg").convert()
 
-space_8B = pygame.image.load("Policko.jpg").convert()
-space_8D = pygame.image.load("Policko.jpg").convert()
-space_8F = pygame.image.load("Policko.jpg").convert()
-space_8H = pygame.image.load("Policko.jpg").convert()
-space_7A = pygame.image.load("Policko.jpg").convert()
-space_7C = pygame.image.load("Policko.jpg").convert()
-space_7E = pygame.image.load("Policko.jpg").convert()
-space_7G = pygame.image.load("Policko.jpg").convert()
-space_6B = pygame.image.load("Policko.jpg").convert()
-space_6D = pygame.image.load("Policko.jpg").convert()
-space_6F = pygame.image.load("Policko.jpg").convert()
-space_6H = pygame.image.load("Policko.jpg").convert()
-space_5A = pygame.image.load("Policko.jpg").convert()
-space_5C = pygame.image.load("Policko.jpg").convert()
-space_5E = pygame.image.load("Policko.jpg").convert()
-space_5G = pygame.image.load("Policko.jpg").convert()
-space_4B = pygame.image.load("Policko.jpg").convert()
-space_4D = pygame.image.load("Policko.jpg").convert()
-space_4F = pygame.image.load("Policko.jpg").convert()
-space_4H = pygame.image.load("Policko.jpg").convert()
-space_3A = pygame.image.load("Policko.jpg").convert()
-space_3C = pygame.image.load("Policko.jpg").convert()
-space_3E = pygame.image.load("Policko.jpg").convert()
-space_3G = pygame.image.load("Policko.jpg").convert()
-space_2B = pygame.image.load("Policko.jpg").convert()
-space_2D = pygame.image.load("Policko.jpg").convert()
-space_2F = pygame.image.load("Policko.jpg").convert()
-space_2H = pygame.image.load("Policko.jpg").convert()
-space_1A = pygame.image.load("Policko.jpg").convert()
-space_1C = pygame.image.load("Policko.jpg").convert()
-space_1E = pygame.image.load("Policko.jpg").convert()
-space_1G = pygame.image.load("Policko.jpg").convert()
+space_8B = space("8B")
+space_8D = space("8D")
+space_8F = space("8F")
+space_8H = space("8H")
+space_7A = space("7A")
+space_7C = space("7C")
+space_7E = space("7E")
+space_7G = space("7G")
+space_6B = space("6B")
+space_6D = space("6D")
+space_6F = space("6F")
+space_6H = space("6H")
+space_5A = space("5A")
+space_5C = space("5C")
+space_5E = space("5E")
+space_5G = space("5G")
+space_4B = space("4B")
+space_4D = space("4D")
+space_4F = space("4F")
+space_4H = space("4H")
+space_3A = space("3A")
+space_3C = space("3C")
+space_3E = space("3E")
+space_3G = space("3G")
+space_2B = space("2B")
+space_2D = space("2D")
+space_2F = space("2F")
+space_2H = space("2H")
+space_1A = space("1A")
+space_1C = space("1C")
+space_1E = space("1E")
+space_1G = space("1G")
 
 spaces = [space_8B, space_8D, space_8F, space_8H, space_7A, space_7C, space_7E, space_7G, 
           space_6B, space_6D, space_6F, space_6H, space_5A, space_5C, space_5E, space_5G, 
@@ -402,33 +410,14 @@ while running:
                 elif event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
                     mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
-                    for space in spaces:
-                        if space.rect.collidepoint(mouse_pos):
+                    for place in spaces:
+                        if place.rect.collidepoint(mouse_pos):
                             print("yes")
 
     screen.fill((255,255,255))
     screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
-    for space in spaces:
-        y = 61
-        for j in range(4):
-            x = 124
-            for k in range(4):
-                chessboard.blit(space, (x,y))
-                space.get_rect()
-                space.rect.left = x
-                space.rect.top = y
-                #space.rect = pygame.Rect((x,y), (60,60))
-                x += 122
-            y += 61.5
-            x = 64
-            for k in range(4):
-                chessboard.blit(space, (x,y))
-                space.get_rect()
-                space.rect.left = x
-                space.rect.top = y
-                #space.rect = pygame.Rect((x,y), (60,60))
-                x += 122
-            y += 61.5
+    for place in spaces:
+        chessboard.blit(place.surf, (place.position))
 
     pieces = white
     for i in range(2):
