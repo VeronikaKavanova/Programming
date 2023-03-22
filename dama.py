@@ -70,9 +70,10 @@ class piece:
         self.rows = rows
         self.columns = columns
         if self.colour == 1:
-            self.surf = pygame.image.load("WPiece.png").convert()
+            self.surf = pygame.image.load("WPiece.png").convert_alpha()
         else:
-            self.surf = pygame.image.load("BPiece.png").convert()
+            self.surf = pygame.image.load("BPiece.png").convert_alpha()
+        self.surf = pygame.transform.smoothscale(self.surf, (60,60))
         self.rect = self.surf.get_rect()
 
     def is_queen(self):
@@ -343,6 +344,17 @@ spaces = [space_8B, space_8D, space_8F, space_8H, space_7A, space_7C, space_7E, 
           space_4B, space_4D, space_4F, space_4H, space_3A, space_3C, space_3E, space_3G, 
           space_2B, space_2D, space_2F, space_2H, space_1A, space_1C, space_1E, space_1G]
 
+coordinates = {
+    "1A" : (64,491.5), "1C" : (186,491.5), "1E" : (308,491.5), "1G" : (430,491.5),
+    "2B" : (124,430), "2D" : (246,430), "2F" : (368,430), "2H" : (490,430),
+    "3A" : (64,368.5), "3C" : (186,368.5), "3E" : (308,368.5), "3G" : (430,368.5),
+    "4B" : (124,307), "4D" : (246,307), "4F" : (368,307), "4H" : (490,307),
+    "5A" : (64,245.5), "5C" : (186,245.5), "5E" : (308,245.5), "5G" : (430,245.5),
+    "6B" : (124,184), "6D" : (246,184), "6F" : (368,184), "6H" : (490,184),
+    "7A" : (64,122.5), "7C" : (186,122.5), "7E" : (308,122.5), "7G" : (430,122.5),
+    "8B" : (124,61), "8D" : (246,61), "8F" : (368,61), "8H" : (490,61),
+    }
+
 running = True
 
 while running:
@@ -367,7 +379,10 @@ while running:
                 x += 122
             y += 61.5
 
-    chessboard.blit(W1.surf, (90, 150))
+    for w in white:
+        chessboard.blit(w.surf, coordinates[w.old_position()])
+    for b in black:
+        chessboard.blit(b.surf, coordinates[b.old_position()])
 
     pygame.display.flip()
 
