@@ -4,6 +4,8 @@ from pygame.locals import (
     RLEACCEL,
     K_ESCAPE,
     KEYDOWN,
+    MOUSEBUTTONDOWN,
+    MOUSEBUTTONUP,
     QUIT,
 )
 
@@ -18,6 +20,17 @@ screen_width = 1200
 screen_height = 650
 
 screen = pygame.display.set_mode((screen_width, screen_height))
+
+coordinates = {
+    "1A" : (64,491.5), "1C" : (186,491.5), "1E" : (308,491.5), "1G" : (430,491.5),
+    "2B" : (124,430), "2D" : (246,430), "2F" : (368,430), "2H" : (490,430),
+    "3A" : (64,368.5), "3C" : (186,368.5), "3E" : (308,368.5), "3G" : (430,368.5),
+    "4B" : (124,307), "4D" : (246,307), "4F" : (368,307), "4H" : (490,307),
+    "5A" : (64,245.5), "5C" : (186,245.5), "5E" : (308,245.5), "5G" : (430,245.5),
+    "6B" : (124,184), "6D" : (246,184), "6F" : (368,184), "6H" : (490,184),
+    "7A" : (64,122.5), "7C" : (186,122.5), "7E" : (308,122.5), "7G" : (430,122.5),
+    "8B" : (124,61), "8D" : (246,61), "8F" : (368,61), "8H" : (490,61),
+    }
 
 turn = 1
 can_jump = []
@@ -74,7 +87,6 @@ class piece:
         else:
             self.surf = pygame.image.load("BPiece.png").convert_alpha()
         self.surf = pygame.transform.smoothscale(self.surf, (60,60))
-        self.rect = self.surf.get_rect()
 
     def is_queen(self):
         if self.rows == (4.5+3.5*self.colour):
@@ -344,17 +356,6 @@ spaces = [space_8B, space_8D, space_8F, space_8H, space_7A, space_7C, space_7E, 
           space_4B, space_4D, space_4F, space_4H, space_3A, space_3C, space_3E, space_3G, 
           space_2B, space_2D, space_2F, space_2H, space_1A, space_1C, space_1E, space_1G]
 
-coordinates = {
-    "1A" : (64,491.5), "1C" : (186,491.5), "1E" : (308,491.5), "1G" : (430,491.5),
-    "2B" : (124,430), "2D" : (246,430), "2F" : (368,430), "2H" : (490,430),
-    "3A" : (64,368.5), "3C" : (186,368.5), "3E" : (308,368.5), "3G" : (430,368.5),
-    "4B" : (124,307), "4D" : (246,307), "4F" : (368,307), "4H" : (490,307),
-    "5A" : (64,245.5), "5C" : (186,245.5), "5E" : (308,245.5), "5G" : (430,245.5),
-    "6B" : (124,184), "6D" : (246,184), "6F" : (368,184), "6H" : (490,184),
-    "7A" : (64,122.5), "7C" : (186,122.5), "7E" : (308,122.5), "7G" : (430,122.5),
-    "8B" : (124,61), "8D" : (246,61), "8F" : (368,61), "8H" : (490,61),
-    }
-
 running = True
 
 while running:
@@ -362,6 +363,15 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
+            print(mouse_pos)
+            if turn == 1: array = white
+            else: array = black
+            for i in array:
+                if i.rect.collidepoint(mouse_pos):
+                    print("yes")
 
     screen.fill((255,255,255))
     screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
@@ -379,10 +389,15 @@ while running:
                 x += 122
             y += 61.5
 
-    for w in white:
-        chessboard.blit(w.surf, coordinates[w.old_position()])
-    for b in black:
-        chessboard.blit(b.surf, coordinates[b.old_position()])
+    pieces = white
+    for i in range(2):
+        for p in pieces:
+            chessboard.blit(p.surf, coordinates[p.old_position()])
+            p.rect = p.surf.get_rect()
+            position = coordinates[p.old_position()]
+            p.rect.left = position[0]
+            p.rect.top = position[1]
+        pieces = black
 
     pygame.display.flip()
 
