@@ -101,6 +101,11 @@ class piece:
     def is_queen(self):
         if self.rows == (4.5+3.5*self.colour):
             self.__class__ = queen
+            if self.colour == 1:
+                self.surf = pygame.image.load("WQueen.png").convert_alpha()
+            else:
+                self.surf = pygame.image.load("BQueen.png").convert_alpha()
+            self.surf = pygame.transform.smoothscale(self.surf, (60,60))
             return True
     
     def old_position(self):
