@@ -232,14 +232,45 @@ class piece:
                                     self.jump_possible()
                                     if self.__class__.__name__ == "queen": jumping_possibilities = can_jump_queens
                                     else: jumping_possibilities = can_jump 
-                                    for i in jumping_possibilities:
-                                        if self in i:
-                                            goal_empty_space = input("Write to which space would you like to jump: ")
-                                            turn = turn*(-1)
-                                            self.jump(goal_empty_space)
+                                    if jumping_possibilities != []:
+
+                                        turn = turn*(-1) 
+                                        have_to_jump = True
+                                        
+                                        while have_to_jump:
+                                            
+                                            screen.fill((255,255,255))
+                                            screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
+
+                                            for place in spaces:
+                                                chessboard.blit(place.surf, (place.position))
+
+                                            pieces = white
+                                            for i in range(2):
+                                                for p in pieces:
+                                                    chessboard.blit(p.surf, coordinates[p.old_position()])
+                                                    p.rect = pygame.Rect(coordinates[p.old_position()], (60,60))
+                                                pieces = black
+
+                                            pygame.display.flip()
+
+                                            for event in pygame.event.get():
+                                                if event.type == pygame.QUIT:
+                                                    global running
+                                                    have_to_jump = False
+                                                    running = False
+                                                elif event.type == pygame.MOUSEBUTTONDOWN:                                        
+                                                    if event.button == 1:
+                                                        mouse_pos = pygame.mouse.get_pos()
+                                                        mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
+                                                        for place in spaces:
+                                                            if place.rect.collidepoint(mouse_pos):  
+                                                                self.jump(place.which_one)
+                                                                if turn != self.colour:
+                                                                    have_to_jump = False
                                     break
-                                #else:
-                                    #print("You can't jump there,")
+                                else:
+                                    print("You can't jump there,")
                             else:
                                 print("This piece can't jump.")
                     else:
@@ -407,7 +438,6 @@ while running:
                     for i in array:
                         if i.rect.collidepoint(mouse_pos):
                             active = i
-                            print("yes")
             else:
                 if event.button == 3:
                     active = ""
@@ -427,6 +457,7 @@ while running:
                                 active.jump(place.which_one)
                                 active = ""
                                 break
+                    active = ""
 
     screen.fill((255,255,255))
     screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
@@ -441,32 +472,3 @@ while running:
         pieces = black
 
     pygame.display.flip()
-
-#W12.move("4F")
-#B1.move("5A")
-#W8.move("3G")
-#B5.move("6B")
-#W4.move("2H")
-#B2.move("5C")
-#W11.move("4D")
-#B2.jump("3E")
-#W8.move("4H")
-#B2.move("3E")
-#W10.move("4B")
-#B2.jump("5G")
-#W3.move("2F")
-#B1.jump("3C")
-#W9.move("4B")
-#B1.jump("5A")
-#W2.move("2D")
-#B1.jump("1E")
-#W4.jump("4F")
-#B2.jump("3E") 
-#W5.move(1)
-#B4.move(-1)
-#W1.move(1)
-#B2.move([1,1,1])
-#W5.move(1)
-#B2.move([1,-1,1])
-#W1.move(1)
-#B2.jump("2B")
