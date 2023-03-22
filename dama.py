@@ -101,9 +101,16 @@ class piece:
         x = str(self.newrows) + self.newcolumns 
         return x
 
-    def update(self, direction):
-        self.newrows = self.rows + self.colour
+    def update(self,direction):
+        self.newrows = self.rows + self.colour 
         self.newcolumns = chr(ord(self.columns) + direction)
+
+    def check(self):
+        if self.newrows == self.rows + self.colour:
+            if self.newcolumns == chr(ord(self.columns) + 1):
+                return True
+            elif self.newcolumns == chr(ord(self.columns) - 1):
+                return True
 
     def can_queens_jump(self):
         if self.colour == 1: array = white
@@ -133,7 +140,7 @@ class piece:
                 #lse:
                     #print("There's noone to jump over")
     
-    def move(self, direction):
+    def move(self, goal_empty_space):
         global turn
         if game == True: 
             if turn == self.colour:
@@ -146,18 +153,22 @@ class piece:
                         i.jump_possible()
                     #print(can_jump)
                     if can_jump == [] and can_jump_queens == []:
-                        self.update(direction)
+                        self.newrows = int(goal_empty_space[0])
+                        self.newcolumns = goal_empty_space[1]
                         x = self.new_position()
                         if (x in board.keys() and board[x] == ""):
-                            y = self.old_position()
-                            board[x] = self
-                            board[y] = ""
-                            self.rows = self.newrows
-                            self.columns = self.newcolumns
-                            self.is_queen
-                            print(self, y, "to", x)
-                            turn = turn*(-1)
-                            end_of_game()
+                            if i.check() == True:
+                                y = self.old_position()
+                                board[x] = self
+                                board[y] = ""
+                                self.rows = self.newrows
+                                self.columns = self.newcolumns
+                                self.is_queen
+                                print(self, y, "to", x)
+                                turn = turn*(-1)
+                                end_of_game()
+                            else:
+                                print("you can't get to this space")
                         else:
                             print("Toto políčko neexistuje nebo je obsazené.")
                     else:
@@ -235,6 +246,13 @@ class queen(piece):
 
     def can_queens_jump(self):
         pass
+
+    def check(self):
+        y = self.old_position
+        for diagonal in diagonals:
+            if y in diagonal:
+                if x in diagonal:
+                    return True
 
     def update(self, direction):
         number = direction[0]
@@ -364,14 +382,14 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
-            print(mouse_pos)
-            if turn == 1: array = white
-            else: array = black
-            for i in array:
-                if i.rect.collidepoint(mouse_pos):
-                    print("yes")
+            if event.button == 1:
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
+                if turn == 1: array = white
+                else: array = black
+                for i in array:
+                    if i.rect.collidepoint(mouse_pos):
+                        pass
 
     screen.fill((255,255,255))
     screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
@@ -401,9 +419,9 @@ while running:
 
     pygame.display.flip()
 
-#W12.move(-1)
-#B1.move(-1)
-#W8.move(-1)
+W12.move("4F")
+B1.move("5C")
+W8.move("3G")
 #B5.move(1)
 #W4.move(1)
 #B2.move(-1)
