@@ -35,6 +35,8 @@ coordinates = {
 turn = 1
 can_jump = []
 can_jump_queens = []
+active = ""
+
 game = True
 
 def end_of_game():
@@ -166,6 +168,7 @@ class piece:
                                 self.is_queen
                                 print(self, y, "to", x)
                                 turn = turn*(-1)
+                                active = ""
                                 end_of_game()
                             else:
                                 print("you can't get to this space")
@@ -209,6 +212,7 @@ class piece:
                                     print(self, y, "takes", i[1])
                                     print(self, y, "to", i[2])
                                     turn = turn*(-1)
+                                    active = ""
                                     end_of_game()
                                     if self.is_queen() == True:
                                         break
@@ -382,14 +386,25 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                mouse_pos = pygame.mouse.get_pos()
-                mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
-                if turn == 1: array = white
-                else: array = black
-                for i in array:
-                    if i.rect.collidepoint(mouse_pos):
-                        pass
+            if active == "":
+                if event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
+                    if turn == 1: array = white
+                    else: array = black
+                    for i in array:
+                        if i.rect.collidepoint(mouse_pos):
+                            active = i
+                            print("yes")
+            else:
+                if event.button == 3:
+                    active = ""
+                elif event.button == 1:
+                    mouse_pos = pygame.mouse.get_pos()
+                    mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
+                    for space in spaces:
+                        if space.rect.collidepoint(mouse_pos):
+                            print("yes")
 
     screen.fill((255,255,255))
     screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
@@ -399,11 +414,19 @@ while running:
             x = 124
             for k in range(4):
                 chessboard.blit(space, (x,y))
+                space.get_rect()
+                space.rect.left = x
+                space.rect.top = y
+                #space.rect = pygame.Rect((x,y), (60,60))
                 x += 122
             y += 61.5
             x = 64
             for k in range(4):
                 chessboard.blit(space, (x,y))
+                space.get_rect()
+                space.rect.left = x
+                space.rect.top = y
+                #space.rect = pygame.Rect((x,y), (60,60))
                 x += 122
             y += 61.5
 
@@ -411,31 +434,28 @@ while running:
     for i in range(2):
         for p in pieces:
             chessboard.blit(p.surf, coordinates[p.old_position()])
-            p.rect = p.surf.get_rect()
-            position = coordinates[p.old_position()]
-            p.rect.left = position[0]
-            p.rect.top = position[1]
+            p.rect = pygame.Rect(coordinates[p.old_position()], (60,60))
         pieces = black
 
     pygame.display.flip()
 
-W12.move("4F")
-B1.move("5C")
-W8.move("3G")
-#B5.move(1)
-#W4.move(1)
-#B2.move(-1)
-#W11.move(-1)
+#W12.move("4F")
+#B1.move("5A")
+#W8.move("3G")
+#B5.move("6B")
+#W4.move("2H")
+#B2.move("5C")
+#W11.move("4D")
 #B2.jump("3E")
-#W8.move(1)
-#B2.move([2, -1, 1])
-#W10.move(-1)
+#W8.move("4H")
+#B2.move("3E")
+#W10.move("4B")
 #B2.jump("5G")
-#W3.move(1)
+#W3.move("2F")
 #B1.jump("3C")
-#W9.move(1)
+#W9.move("4B")
 #B1.jump("5A")
-#W2.move(1)
+#W2.move("2D")
 #B1.jump("1E")
 #W4.jump("4F")
 #B2.jump("3E") 
