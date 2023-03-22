@@ -81,6 +81,7 @@ class space():
 
     def __init__(self, which_one):
         self.surf = pygame.image.load("Policko.jpg").convert()
+        self.which_one = which_one
         self.position = coordinates[which_one]
         self.rect = pygame.Rect(self.position, (60,60))
 
@@ -175,7 +176,6 @@ class piece:
                                 self.is_queen
                                 print(self, y, "to", x)
                                 turn = turn*(-1)
-                                active = ""
                                 end_of_game()
                             else:
                                 print("you can't get to this space")
@@ -219,7 +219,6 @@ class piece:
                                     print(self, y, "takes", i[1])
                                     print(self, y, "to", i[2])
                                     turn = turn*(-1)
-                                    active = ""
                                     end_of_game()
                                     if self.is_queen() == True:
                                         break
@@ -412,7 +411,17 @@ while running:
                     mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
                     for place in spaces:
                         if place.rect.collidepoint(mouse_pos):
-                            print("yes")
+                            can_jump.clear()
+                            can_jump_queens.clear()
+                            active.jump_possible()
+                            if can_jump == [] and can_jump_queens == []:
+                                active.move(place.which_one)
+                                active = ""
+                                break
+                            else:
+                                active.jump(place.which_one)
+                                active = ""
+                                break
 
     screen.fill((255,255,255))
     screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
