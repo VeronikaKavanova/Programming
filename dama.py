@@ -9,11 +9,6 @@ from pygame.locals import (
     QUIT,
 )
 
-#postup jak na git
-#git add .
-#git commit -m "smyslnuplna zprava"
-#git push
-
 pygame.init()
 
 screen_width = 1200
