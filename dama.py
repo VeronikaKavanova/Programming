@@ -92,22 +92,28 @@ class piece:
         self.colour = colour
         self.rows = rows
         self.columns = columns
+        self.is_not_active()
+
+    def is_queen(self):
+        if self.rows == (4.5+3.5*self.colour):
+            self.__class__ = queen
+            self.is_not_active()
+            return True
+    
+    def is_active(self):
+        if self.colour == 1:
+            self.surf = pygame.image.load("WPiece_active.png").convert_alpha()
+        else:
+            self.surf = pygame.image.load("BPiece_active.png").convert_alpha()
+        self.surf = pygame.transform.smoothscale(self.surf, (60,60))
+
+    def is_not_active(self):
         if self.colour == 1:
             self.surf = pygame.image.load("WPiece.png").convert_alpha()
         else:
             self.surf = pygame.image.load("BPiece.png").convert_alpha()
         self.surf = pygame.transform.smoothscale(self.surf, (60,60))
 
-    def is_queen(self):
-        if self.rows == (4.5+3.5*self.colour):
-            self.__class__ = queen
-            if self.colour == 1:
-                self.surf = pygame.image.load("WQueen.png").convert_alpha()
-            else:
-                self.surf = pygame.image.load("BQueen.png").convert_alpha()
-            self.surf = pygame.transform.smoothscale(self.surf, (60,60))
-            return True
-    
     def old_position(self):
         x = str(self.rows) + self.columns
         return x
@@ -166,19 +172,18 @@ class piece:
                     can_jump_queens.clear()
                     for i in array:
                         i.jump_possible()
-                    #print(can_jump)
                     if can_jump == [] and can_jump_queens == []:
                         self.newrows = int(goal_empty_space[0])
                         self.newcolumns = goal_empty_space[1]
                         x = self.new_position()
                         if (x in board.keys() and board[x] == ""):
-                            if i.check() == True:
+                            if self.check() == True:
                                 y = self.old_position()
                                 board[x] = self
                                 board[y] = ""
                                 self.rows = self.newrows
                                 self.columns = self.newcolumns
-                                self.is_queen
+                                self.is_queen()
                                 print(self, y, "to", x)
                                 turn = turn*(-1)
                                 end_of_game()
@@ -293,20 +298,27 @@ class queen(piece):
     def can_queens_jump(self):
         pass
 
+    def is_active(self):
+        if self.colour == 1:
+            self.surf = pygame.image.load("WQueen_active.png").convert_alpha()
+        else:
+            self.surf = pygame.image.load("BQueen_active.png").convert_alpha()
+        self.surf = pygame.transform.smoothscale(self.surf, (60,60))
+
+    def is_not_active(self):
+        if self.colour == 1:
+            self.surf = pygame.image.load("WQueen.png").convert_alpha()
+        else:
+            self.surf = pygame.image.load("BQueen.png").convert_alpha()
+        self.surf = pygame.transform.smoothscale(self.surf, (60,60))
+
     def check(self):
-        y = self.old_position
+        y = self.old_position()
         for diagonal in diagonals:
             if y in diagonal:
-                x = self.new_position
+                x = self.new_position()
                 if x in diagonal:
                     return True
-
-    def update(self, direction):
-        number = direction[0]
-        horizontal = direction[1]
-        vertical = direction[2]
-        self.newrows = self.rows + number*vertical     
-        self.newcolumns = chr(ord(self.columns) + number*horizontal)
     
     def jump_possible(self):
         x = self.old_position()
@@ -438,8 +450,10 @@ while running:
                     for i in array:
                         if i.rect.collidepoint(mouse_pos):
                             active = i
+                            active.is_active()
             else:
                 if event.button == 3:
+                    active.is_not_active()
                     active = ""
                 elif event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
@@ -451,12 +465,16 @@ while running:
                             active.jump_possible()
                             if can_jump == [] and can_jump_queens == []:
                                 active.move(place.which_one)
+                                active.is_not_active()
                                 active = ""
                                 break
                             else:
                                 active.jump(place.which_one)
+                                active.is_not_active()
                                 active = ""
                                 break
+                    if active != "":
+                        active.is_not_active()
                     active = ""
 
     screen.fill((255,255,255))
