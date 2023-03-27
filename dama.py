@@ -37,29 +37,47 @@ draw_counter = 0
 same_position_white = []
 same_position_black = []
 
+win_w_pieces = pygame.image.load("win_w_pieces.png")
+win_w_moves = pygame.image.load("win_w_moves.png")
+win_b_pieces = pygame.image.load("win_b_pieces.png")
+win_b_moves = pygame.image.load("win_b_moves.png")
+draw_moves = pygame.image.load("draw_moves.png")
+draw_repetition = pygame.image.load("draw_repetition.png")
+
+def notification(which_one):
+    notification = True
+    while notification == True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_ESCAPE:
+                    notification = False
+        screen.blit(which_one, which_one.get_rect(center = screen.get_rect().center))
+        pygame.display.flip()
+
 def end_of_game():
     global game
     if turn == 1: 
         array = white
-        name = "white"
         same_position_white.append(dict(board))
         same_position = same_position_white
     else: 
         array = black
-        name = "black"
         same_position_black.append(dict(board))
         same_position = same_position_black
     for i in same_position:
         count = same_position.count(i)
         if count > 2:
             game = False
-            print("Je to remíza, jelikož tato pozice je tu již potřetí.")
+            notification(draw_repetition)
     if draw_counter == 15:
         game = False
-        print("Je to remíza, jelikož v 15 posledních tazích nedošlo k braní ani tahu kamenem.")
+        notification(draw_moves)
     elif array == []:
         game = False
-        print(name, "lost, because they don't have any more pieces.")
+        if turn == 1:
+            notification(win_b_pieces)
+        else:
+            notification(win_w_pieces)
     else: 
         can_jump.clear()
         can_jump_queens.clear()
@@ -85,7 +103,10 @@ def end_of_game():
                         if (x in board.keys() and board[x] == ""):
                             return True
             game = False
-            print(name, "lost, because none of their pieces can move.")
+            if turn == 1:
+                notification(win_b_moves)
+            else:
+                notification(win_w_moves)
 
 class space:
 
@@ -437,7 +458,6 @@ no_button = button("NE.png",381,159,155,86)
 
 title = pygame.image.load("Title.png")
 warning = pygame.image.load("warning.png")
-
 
 while running:
 
