@@ -96,10 +96,10 @@ class space:
 
 class button:
 
-    def __init__(self, which_one,y):
+    def __init__(self, which_one,x,y,width,height):
         self.surf = pygame.image.load(which_one).convert()
-        self.position = ((screen.get_width()-300)/2,y)
-        self.rect = pygame.Rect(self.position,(300,80))
+        self.position = ((x,y))
+        self.rect = pygame.Rect(self.position,(width,height))
         
 class piece:
     
@@ -452,11 +452,15 @@ running = True
 game = False
 
 gap = (3/16)*screen.get_height()-60
-quit_button = button("QUIT.png",screen.get_height() - gap - 80)
-tutorial_button = button("TUTORIAL.png",screen.get_height()-2*gap - 160)
-play_button = button("PLAY.png",screen.get_height()-3*gap - 240)
+quit_button = button("QUIT.png",(screen.get_width()-300)/2,screen.get_height() - gap - 80,300,80)
+tutorial_button = button("TUTORIAL.png",(screen.get_width()-300)/2,screen.get_height()-2*gap - 160,300,80)
+play_button = button("PLAY.png",(screen.get_width()-300)/2,screen.get_height()-3*gap - 240,300,80)
+yes_button = button("ANO.png",85,159,155,86)
+no_button = button("NE.png",381,159,155,86)
 
 title = pygame.image.load("Title.png")
+warning = pygame.image.load("warning.png")
+
 
 while running:
 
@@ -478,8 +482,25 @@ while running:
 
     while game:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == K_ESCAPE:
+                    end = True
+                    while end:
+                        for event in pygame.event.get():
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                if event.button == 1:
+                                    mouse_pos = pygame.mouse.get_pos()
+                                    mouse_pos = (mouse_pos[0] - (screen.get_rect().center[0]-300), mouse_pos[1] - (screen.get_rect().center[1]-150))
+                                    if yes_button.rect.collidepoint(mouse_pos):
+                                        end = False
+                                        game = False
+                                    elif no_button.rect.collidepoint(mouse_pos):
+                                        end = False
+                        screen.blit(warning, warning.get_rect(center = screen.get_rect().center))
+                        warning.blit(yes_button.surf,yes_button.position)
+                        warning.blit(no_button.surf,no_button.position)
+                        pygame.display.flip()
+                            
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if active == "":
                     if event.button == 1:
@@ -517,8 +538,8 @@ while running:
                             active.is_not_active()
                         active = ""
 
-        screen.fill((255,255,255))
-        screen.blit(chessboard, ((screen.get_width()-chessboard.get_width())/2,(screen.get_height()-chessboard.get_height())/2))
+        screen.fill((134,111,188))
+        screen.blit(chessboard, chessboard.get_rect(center = screen.get_rect().center))
         for place in spaces:
             chessboard.blit(place.surf, (place.position))
 
