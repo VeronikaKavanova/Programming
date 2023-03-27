@@ -15,7 +15,6 @@ pygame.init()
 screen_width = 1200
 screen_height = 650
 
-print(os.getcwd())
 
 screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
 
@@ -262,9 +261,8 @@ class piece:
                                         
                                         while have_to_jump:
                                             
-                                            screen.fill((255,255,255))
-                                            screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
-
+                                            screen.fill((134,111,188))
+                                            screen.blit(chessboard, chessboard.get_rect(center = screen.get_rect().center))
                                             for place in spaces:
                                                 chessboard.blit(place.surf, (place.position))
 
