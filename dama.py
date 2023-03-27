@@ -217,7 +217,7 @@ class piece:
             print("The game is over.")
 
     def jump(self, goal_empty_space):
-        global game, turn, draw_counter
+        global game, game_running, turn, draw_counter
         if game == True:
             if turn == self.colour:
                 if self in board.values():
@@ -276,14 +276,30 @@ class piece:
                                             pygame.display.flip()
 
                                             for event in pygame.event.get():
-                                                if event.type == pygame.QUIT:
-                                                    global running
-                                                    have_to_jump = False
-                                                    running = False
+                                                if event.type == pygame.KEYDOWN:
+                                                    if event.key == K_ESCAPE:
+                                                        end = True
+                                                        while end:
+                                                            for event in pygame.event.get():
+                                                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                                                    if event.button == 1:
+                                                                        mouse_pos = pygame.mouse.get_pos()
+                                                                        mouse_pos = (mouse_pos[0] - (screen.get_rect().center[0]-300), mouse_pos[1] - (screen.get_rect().center[1]-150))
+                                                                        if yes_button.rect.collidepoint(mouse_pos):
+                                                                            have_to_jump = False
+                                                                            end = False
+                                                                            game = False
+                                                                            game_running = False
+                                                                        elif no_button.rect.collidepoint(mouse_pos):
+                                                                            end = False
+                                                            screen.blit(warning, warning.get_rect(center = screen.get_rect().center))
+                                                            warning.blit(yes_button.surf,yes_button.position)
+                                                            warning.blit(no_button.surf,no_button.position)
+                                                            pygame.display.flip()
                                                 elif event.type == pygame.MOUSEBUTTONDOWN:                                        
                                                     if event.button == 1:
                                                         mouse_pos = pygame.mouse.get_pos()
-                                                        mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
+                                                        mouse_pos = (mouse_pos[0] - ((screen.get_width()-chessboard.get_width())/2), mouse_pos[1] - ((screen.get_height()-chessboard.get_height())/2))
                                                         for place in spaces:
                                                             if place.rect.collidepoint(mouse_pos):  
                                                                 self.jump(place.which_one)
@@ -291,7 +307,7 @@ class piece:
                                                                     have_to_jump = False
                                     break
                                 else:
-                                    print("You can't jump there,")
+                                    print("You can't jump there")
                             else:
                                 print("This piece can't jump.")
                     else:
@@ -362,51 +378,11 @@ class queen(piece):
                                 else:
                                     break
 
-W1 = piece(1,"W1",1,"A")
-W2 = piece(1,"W2",1,"C")
-W3 = piece(1,"W3",1,"E")
-W4 = piece(1,"W4",1,"G")
-W5 = piece(1,"W5",2,"B")
-W6 = piece(1,"W6",2,"D")
-W7 = piece(1,"W7",2,"F")
-W8 = piece(1,"W8",2,"H")
-W9 = piece(1,"W9",3,"A")
-W10 = piece(1,"W10",3,"C")
-W11 = piece(1,"W11",3,"E")
-W12 = piece(1,"W12",3,"G")
-
-B1 = piece(-1,"B1",6,"B")
-B2 = piece(-1,"B2",6,"D")
-B3 = piece(-1,"B3",6,"F")
-B4 = piece(-1,"B4",6,"H")
-B5 = piece(-1,"B5",7,"A")
-B6 = piece(-1,"B6",7,"C")
-B7 = piece(-1,"B7",7,"E")
-B8 = piece(-1,"B8",7,"G")
-B9 = piece(-1,"B9",8,"B")
-B10 = piece(-1,"B10",8,"D")
-B11 = piece(-1,"B11",8,"F")
-B12 = piece(-1,"B12",8,"H")
-
-board = {
-    "1A" : W1, "1C" : W2, "1E" : W3, "1G" : W4,
-    "2B" : W5, "2D" : W6, "2F" : W7, "2H" : W8,
-    "3A" : W9, "3C" : W10, "3E" : W11, "3G" : W12,
-    "4B" : "", "4D" : "", "4F" : "", "4H" : "",
-    "5A" : "", "5C" : "", "5E" : "", "5G" : "",
-    "6B" : B1, "6D" : B2, "6F" : B3, "6H" : B4,
-    "7A" : B5, "7C" : B6, "7E" : B7, "7G" : B8,
-    "8B" : B9, "8D" : B10, "8F" : B11, "8H" : B12,
-    }
-
 diagonals = [["7A", "8B"],["5A", "6B", "7C", "8D"],["3A","4B","5C","6D","7E","8F"],
              ["1A", "2B", "3C", "4D", "5E", "6F", "7G", "8H"], ["1C", "2D", "3E", "4F", "5G", "6H"], 
              ["1E", "2F", "3G", "4H"], ["1G", "2H"], ["3A", "2B", "1C"], ["5A", "4B", "3C", "2D", "1E"], 
              ["7A", "6B", "5C", "4D", "3E", "2F", "1G"], ["8B", "7C", "6D", "5E", "4F", "3G" ,"2H"], 
              ["8D", "7E", "6F", "5G", "4H"], ["8F", "7G", "6H"]]
-
-black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
-white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
 
 chessboard = pygame.image.load("chessboard.jpg").convert()
 
@@ -449,6 +425,7 @@ spaces = [space_8B, space_8D, space_8F, space_8H, space_7A, space_7C, space_7E, 
           space_2B, space_2D, space_2F, space_2H, space_1A, space_1C, space_1E, space_1G]
 
 running = True
+game_running = False
 game = False
 
 gap = (3/16)*screen.get_height()-60
@@ -472,6 +449,47 @@ while running:
                     running = False
                 elif play_button.rect.collidepoint(mouse_pos):
                     game = True
+                    game_running = True
+
+                    W1 = piece(1,"W1",1,"A")
+                    W2 = piece(1,"W2",1,"C")
+                    W3 = piece(1,"W3",1,"E")
+                    W4 = piece(1,"W4",1,"G")
+                    W5 = piece(1,"W5",2,"B")
+                    W6 = piece(1,"W6",2,"D")
+                    W7 = piece(1,"W7",2,"F")
+                    W8 = piece(1,"W8",2,"H")
+                    W9 = piece(1,"W9",3,"A")
+                    W10 = piece(1,"W10",3,"C")
+                    W11 = piece(1,"W11",3,"E")
+                    W12 = piece(1,"W12",3,"G")
+
+                    B1 = piece(-1,"B1",6,"B")
+                    B2 = piece(-1,"B2",6,"D")
+                    B3 = piece(-1,"B3",6,"F")
+                    B4 = piece(-1,"B4",6,"H")
+                    B5 = piece(-1,"B5",7,"A")
+                    B6 = piece(-1,"B6",7,"C")
+                    B7 = piece(-1,"B7",7,"E")
+                    B8 = piece(-1,"B8",7,"G")
+                    B9 = piece(-1,"B9",8,"B")
+                    B10 = piece(-1,"B10",8,"D")
+                    B11 = piece(-1,"B11",8,"F")
+                    B12 = piece(-1,"B12",8,"H")
+
+                    board = {
+                        "1A" : W1, "1C" : W2, "1E" : W3, "1G" : W4,
+                        "2B" : W5, "2D" : W6, "2F" : W7, "2H" : W8,
+                        "3A" : W9, "3C" : W10, "3E" : W11, "3G" : W12,
+                        "4B" : "", "4D" : "", "4F" : "", "4H" : "",
+                        "5A" : "", "5C" : "", "5E" : "", "5G" : "",
+                        "6B" : B1, "6D" : B2, "6F" : B3, "6H" : B4,
+                        "7A" : B5, "7C" : B6, "7E" : B7, "7G" : B8,
+                        "8B" : B9, "8D" : B10, "8F" : B11, "8H" : B12,
+                        }
+
+                    black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
+                    white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
 
     screen.fill((134,111,188))
     screen.blit(quit_button.surf,(quit_button.position))
@@ -480,7 +498,7 @@ while running:
     screen.blit(title, ((screen.get_width()-title.get_width())/2,gap/2))
     pygame.display.flip()
 
-    while game:
+    while game_running:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == K_ESCAPE:
@@ -494,6 +512,7 @@ while running:
                                     if yes_button.rect.collidepoint(mouse_pos):
                                         end = False
                                         game = False
+                                        game_running = False
                                     elif no_button.rect.collidepoint(mouse_pos):
                                         end = False
                         screen.blit(warning, warning.get_rect(center = screen.get_rect().center))
