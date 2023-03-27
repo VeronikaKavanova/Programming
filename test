@@ -1,2 +1,5 @@
-string = "hi"
-print(string[0])
+from collections import Counter
+list2 = [{"K": "KL"}, {"K": "KL"}, {"B":"ASD"}]
+
+count = Counter(list2)
+print(count)

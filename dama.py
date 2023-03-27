@@ -1,4 +1,5 @@
 import pygame
+import sys
 
 from pygame.locals import (
     RLEACCEL,
@@ -14,7 +15,7 @@ pygame.init()
 screen_width = 1200
 screen_height = 650
 
-screen = pygame.display.set_mode((screen_width, screen_height))
+screen = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
 
 coordinates = {
     "1A" : (64,491.5), "1C" : (186,491.5), "1E" : (308,491.5), "1G" : (430,491.5),
@@ -31,18 +32,31 @@ turn = 1
 can_jump = []
 can_jump_queens = []
 active = ""
-
-game = True
+draw_counter = 0
+same_position_white = []
+same_position_black = []
 
 def end_of_game():
     global game
     if turn == 1: 
         array = white
         name = "white"
+        same_position_white.append(dict(board))
+        same_position = same_position_white
     else: 
         array = black
         name = "black"
-    if array == []:
+        same_position_black.append(dict(board))
+        same_position = same_position_black
+    for i in same_position:
+        count = same_position.count(i)
+        if count > 2:
+            game = False
+            print("Je to remíza, jelikož tato pozice je tu již potřetí.")
+    if draw_counter == 15:
+        game = False
+        print("Je to remíza, jelikož v 15 posledních tazích nedošlo k braní ani tahu kamenem.")
+    elif array == []:
         game = False
         print(name, "lost, because they don't have any more pieces.")
     else: 
@@ -72,7 +86,7 @@ def end_of_game():
             game = False
             print(name, "lost, because none of their pieces can move.")
 
-class space():
+class space:
 
     def __init__(self, which_one):
         self.surf = pygame.image.load("Policko.jpg").convert()
@@ -80,6 +94,13 @@ class space():
         self.position = coordinates[which_one]
         self.rect = pygame.Rect(self.position, (60,60))
 
+class button:
+
+    def __init__(self, which_one,y):
+        self.surf = pygame.image.load(which_one).convert()
+        self.position = ((screen.get_width()-300)/2,y)
+        self.rect = pygame.Rect(self.position,(300,80))
+        
 class piece:
     
     def __init__(self, colour, name, rows, columns):
@@ -149,15 +170,10 @@ class piece:
                     empty_space = self.new_position()
                     if empty_space in board.keys(): 
                         if board[empty_space] == "":
-                            #print(self, "can jump", side)
                             can_jump.append([self, enemy_space, empty_space])
-                        #else:
-                            #print("There's not an empty space")
-                #lse:
-                    #print("There's noone to jump over")
     
     def move(self, goal_empty_space):
-        global turn
+        global game, turn, draw_counter
         if game == True: 
             if turn == self.colour:
                 if self in board.values():
@@ -178,6 +194,10 @@ class piece:
                                 board[y] = ""
                                 self.rows = self.newrows
                                 self.columns = self.newcolumns
+                                if self.__class__.__name__ == "queen":
+                                    draw_counter += 1
+                                else:
+                                    draw_counter = 0
                                 self.is_queen()
                                 print(self, y, "to", x)
                                 turn = turn*(-1)
@@ -195,8 +215,8 @@ class piece:
         else:
             print("The game is over.")
 
-    def jump(self, goal_empty_space): #zadat, kam chce skončit
-        global turn
+    def jump(self, goal_empty_space):
+        global game, turn, draw_counter
         if game == True:
             if turn == self.colour:
                 if self in board.values():
@@ -223,6 +243,7 @@ class piece:
                                     self.columns = position[1]
                                     print(self, y, "takes", i[1])
                                     print(self, y, "to", i[2])
+                                    draw_counter = 0
                                     turn = turn*(-1)
                                     end_of_game()
                                     if self.is_queen() == True:
@@ -335,16 +356,11 @@ class queen(piece):
                             empty_space_index = enemy_space_index
                             for i in range(number_of_spaces):
                                 empty_space_index = empty_space_index + way
-                            #if empty_space_index>-1 and empty_space_index<(len(diagonal)):
                                 empty_space = diagonal[empty_space_index]
                                 if board[empty_space] == "":
                                     can_jump_queens.append([self, enemy_space, empty_space])
                                 else:
                                     break
-                                #else:
-                                    #print("This space isn't empty.")
-                            #else:
-                                #print("This space doesn't exist.")
 
 W1 = piece(1,"W1",1,"A")
 W2 = piece(1,"W2",1,"C")
@@ -383,7 +399,11 @@ board = {
     "8B" : B9, "8D" : B10, "8F" : B11, "8H" : B12,
     }
 
-diagonals = [["7A", "8B"],["5A", "6B", "7C", "8D"],["3A","4B","5C","6D","7E","8F"],["1A", "2B", "3C", "4D", "5E", "6F", "7G", "8H"], ["1C", "2D", "3E", "4F", "5G", "6H"], ["1E", "2F", "3G", "4H"], ["1G", "2H"], ["3A", "2B", "1C"], ["5A", "4B", "3C", "2D", "1E"], ["7A", "6B", "5C", "4D", "3E", "2F", "1G"], ["8B", "7C", "6D", "5E", "4F", "3G" ,"2H"], ["8D", "7E", "6F", "5G", "4H"], ["8F", "7G", "6H"]]
+diagonals = [["7A", "8B"],["5A", "6B", "7C", "8D"],["3A","4B","5C","6D","7E","8F"],
+             ["1A", "2B", "3C", "4D", "5E", "6F", "7G", "8H"], ["1C", "2D", "3E", "4F", "5G", "6H"], 
+             ["1E", "2F", "3G", "4H"], ["1G", "2H"], ["3A", "2B", "1C"], ["5A", "4B", "3C", "2D", "1E"], 
+             ["7A", "6B", "5C", "4D", "3E", "2F", "1G"], ["8B", "7C", "6D", "5E", "4F", "3G" ,"2H"], 
+             ["8D", "7E", "6F", "5G", "4H"], ["8F", "7G", "6H"]]
 
 black = [B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12]
 white = [W1, W2, W3, W4, W5, W6, W7, W8, W9, W10, W11, W12]
@@ -429,59 +449,84 @@ spaces = [space_8B, space_8D, space_8F, space_8H, space_7A, space_7C, space_7E, 
           space_2B, space_2D, space_2F, space_2H, space_1A, space_1C, space_1E, space_1G]
 
 running = True
+game = False
+
+gap = (3/16)*screen.get_height()-60
+quit_button = button("QUIT.png",screen.get_height() - gap - 80)
+tutorial_button = button("TUTORIAL.png",screen.get_height()-2*gap - 160)
+play_button = button("PLAY.png",screen.get_height()-3*gap - 240)
+
+title = pygame.image.load("Title.png")
 
 while running:
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if active == "":
-                if event.button == 1:
-                    mouse_pos = pygame.mouse.get_pos()
-                    mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
-                    if turn == 1: array = white
-                    else: array = black
-                    for i in array:
-                        if i.rect.collidepoint(mouse_pos):
-                            active = i
-                            active.is_active()
-            else:
-                if event.button == 3:
-                    active.is_not_active()
-                    active = ""
-                elif event.button == 1:
-                    mouse_pos = pygame.mouse.get_pos()
-                    mouse_pos = (mouse_pos[0] - 294, mouse_pos[1] - 19)
-                    for place in spaces:
-                        if place.rect.collidepoint(mouse_pos):
-                            can_jump.clear()
-                            can_jump_queens.clear()
-                            active.jump_possible()
-                            if can_jump == [] and can_jump_queens == []:
-                                active.move(place.which_one)
-                                active.is_not_active()
-                                active = ""
-                                break
-                            else:
-                                active.jump(place.which_one)
-                                active.is_not_active()
-                                active = ""
-                                break
-                    if active != "":
-                        active.is_not_active()
-                    active = ""
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                mouse_pos = pygame.mouse.get_pos()
+                if quit_button.rect.collidepoint(mouse_pos):
+                    running = False
+                elif play_button.rect.collidepoint(mouse_pos):
+                    game = True
 
-    screen.fill((255,255,255))
-    screen.blit(chessboard, ((screen_width-chessboard.get_width())/2,(screen_height-chessboard.get_height())/2))
-    for place in spaces:
-        chessboard.blit(place.surf, (place.position))
-
-    pieces = white
-    for i in range(2):
-        for p in pieces:
-            chessboard.blit(p.surf, coordinates[p.old_position()])
-            p.rect = pygame.Rect(coordinates[p.old_position()], (60,60))
-        pieces = black
-
+    screen.fill((134,111,188))
+    screen.blit(quit_button.surf,(quit_button.position))
+    screen.blit(tutorial_button.surf,(tutorial_button.position))
+    screen.blit(play_button.surf,(play_button.position))
+    screen.blit(title, ((screen.get_width()-title.get_width())/2,gap/2))
     pygame.display.flip()
+
+    while game:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if active == "":
+                    if event.button == 1:
+                        mouse_pos = pygame.mouse.get_pos()
+                        mouse_pos = (mouse_pos[0] - ((screen.get_width()-chessboard.get_width())/2), mouse_pos[1] - ((screen.get_height()-chessboard.get_height())/2))
+                        if turn == 1: array = white
+                        else: array = black
+                        for i in array:
+                            if i.rect.collidepoint(mouse_pos):
+                                active = i
+                                active.is_active()
+                else:
+                    if event.button == 3:
+                        active.is_not_active()
+                        active = ""
+                    elif event.button == 1:
+                        mouse_pos = pygame.mouse.get_pos()
+                        mouse_pos = (mouse_pos[0] - ((screen.get_width()-chessboard.get_width())/2), mouse_pos[1] - ((screen.get_height()-chessboard.get_height())/2))
+                        for place in spaces:
+                            if place.rect.collidepoint(mouse_pos):
+                                can_jump.clear()
+                                can_jump_queens.clear()
+                                active.jump_possible()
+                                if can_jump == [] and can_jump_queens == []:
+                                    active.move(place.which_one)
+                                    active.is_not_active()
+                                    active = ""
+                                    break
+                                else:
+                                    active.jump(place.which_one)
+                                    active.is_not_active()
+                                    active = ""
+                                    break
+                        if active != "":
+                            active.is_not_active()
+                        active = ""
+
+        screen.fill((255,255,255))
+        screen.blit(chessboard, ((screen.get_width()-chessboard.get_width())/2,(screen.get_height()-chessboard.get_height())/2))
+        for place in spaces:
+            chessboard.blit(place.surf, (place.position))
+
+        pieces = white
+        for i in range(2):
+            for p in pieces:
+                chessboard.blit(p.surf, coordinates[p.old_position()])
+                p.rect = pygame.Rect(coordinates[p.old_position()], (60,60))
+            pieces = black
+
+        pygame.display.flip()
