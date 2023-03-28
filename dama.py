@@ -455,8 +455,8 @@ tutorial_button = button("TUTORIAL.png",(screen.get_width()-300)/2,screen.get_he
 play_button = button("PLAY.png",(screen.get_width()-300)/2,screen.get_height()-3*gap - 240,300,80)
 yes_button = button("ANO.png",85,159,155,86)
 no_button = button("NE.png",381,159,155,86)
-left_arrow = button("left_arrow.webp",20,20,120,60)
-right_arrow = button("right_arrow.png",20,20,40,20)
+left_arrow = button("left_arrow.png",20,20,120,60)
+right_arrow = button("right_arrow.png",1060,20,120,60)
 
 title = pygame.image.load("Title.png")
 warning = pygame.image.load("warning.png")
@@ -466,6 +466,7 @@ tutorial_page_3 = pygame.image.load("tutorial_page_3.png")
 tutorial_page_4 = pygame.image.load("tutorial_page_4.png")
 tutorial_page_5 = pygame.image.load("tutorial_page_5.png")
 tutorial_page_6 = pygame.image.load("tutorial_page_6.png")
+tutorial_pages = [tutorial_page_1, tutorial_page_2, tutorial_page_3, tutorial_page_4, tutorial_page_5, tutorial_page_6]
 
 while running:
 
@@ -477,15 +478,29 @@ while running:
                     running = False
                 elif tutorial_button.rect.collidepoint(mouse_pos):
                     tutorial = True
-                    tutorial_page = tutorial_page_1
+                    tutorial_number = 0
+                    tutorial_page = tutorial_pages[tutorial_number]
+
                     while tutorial == True:
                         for event in pygame.event.get():
                             if event.type == pygame.KEYDOWN:
                                 if event.key == K_ESCAPE:
                                     tutorial = False
+                            elif event.type == pygame.MOUSEBUTTONDOWN:
+                                if event.button == 1:
+                                    mouse_pos = pygame.mouse.get_pos()
+                                    mouse_pos = (mouse_pos[0] - (screen.get_rect().center[0]-600), mouse_pos[1] - (screen.get_rect().center[1]-325))
+                                    if left_arrow.rect.collidepoint(mouse_pos):
+                                        tutorial_number = (tutorial_number - 1)%6
+                                    elif right_arrow.rect.collidepoint(mouse_pos):
+                                        tutorial_number = (tutorial_number + 1)%6
+                        
+                        tutorial_page = tutorial_pages[tutorial_number]
                         screen.blit(tutorial_page, tutorial_page.get_rect(center = screen.get_rect().center))
                         tutorial_page.blit(left_arrow.surf,(left_arrow.position))
-                        pygame.display.flip()                    
+                        tutorial_page.blit(right_arrow.surf,(right_arrow.position))
+                        pygame.display.flip()
+
                 elif play_button.rect.collidepoint(mouse_pos):
                     game = True
                     game_running = True
