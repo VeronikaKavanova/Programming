@@ -455,7 +455,7 @@ tutorial_button = button("TUTORIAL.png",(screen.get_width()-300)/2,screen.get_he
 play_button = button("PLAY.png",(screen.get_width()-300)/2,screen.get_height()-3*gap - 240,300,80)
 yes_button = button("ANO.png",85,159,155,86)
 no_button = button("NE.png",381,159,155,86)
-left_arrow = button("left_arrow.png",20,20,40,20)
+left_arrow = button("left_arrow.webp",20,20,120,60)
 right_arrow = button("right_arrow.png",20,20,40,20)
 
 title = pygame.image.load("Title.png")
