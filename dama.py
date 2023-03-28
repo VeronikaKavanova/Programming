@@ -467,6 +467,16 @@ while running:
                 mouse_pos = pygame.mouse.get_pos()
                 if quit_button.rect.collidepoint(mouse_pos):
                     running = False
+                elif tutorial_button.rect.collidepoint(mouse_pos):
+                    tutorial = True
+                    tutorial_page = 1
+                    while tutorial == True:
+                        for event in pygame.event.get():
+                            if event.type == pygame.KEYDOWN:
+                                if event.key == K_ESCAPE:
+                                    tutorial = False
+                        screen.blit(tutorial_page, tutorial_page.get_rect(center = screen.get_rect().center))
+                        pygame.display.flip()                    
                 elif play_button.rect.collidepoint(mouse_pos):
                     game = True
                     game_running = True
