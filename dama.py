@@ -77,6 +77,7 @@ def end_of_game():
         if turn == 1:
             notification(win_b_pieces)
         else:
+            print(turn)
             notification(win_w_pieces)
     else: 
         can_jump.clear()
@@ -493,7 +494,7 @@ while running:
                                     if left_arrow.rect.collidepoint(mouse_pos):
                                         tutorial_number = (tutorial_number - 1)%6
                                     elif right_arrow.rect.collidepoint(mouse_pos):
-                                        tutorial_number = (tutorial_number + 1)%6
+                                        tutorial_number = (tutorial_number - 1)%6
                         
                         tutorial_page = tutorial_pages[tutorial_number]
                         screen.blit(tutorial_page, tutorial_page.get_rect(center = screen.get_rect().center))
@@ -504,6 +505,14 @@ while running:
                 elif play_button.rect.collidepoint(mouse_pos):
                     game = True
                     game_running = True
+
+                    turn = 1
+                    can_jump = []
+                    can_jump_queens = []
+                    active = ""
+                    draw_counter = 0
+                    same_position_white = []
+                    same_position_black = []
 
                     W1 = piece(1,"W1",1,"A")
                     W2 = piece(1,"W2",1,"C")
