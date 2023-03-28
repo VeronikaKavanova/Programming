@@ -224,19 +224,7 @@ class piece:
                                 print(self, y, "to", x)
                                 turn = turn*(-1)
                                 end_of_game()
-                            else:
-                                print("you can't get to this space")
-                        else:
-                            print("Toto políčko neexistuje nebo je obsazené.")
-                    else:
-                        print("Someone can jump.")
-                else:
-                    print("Tato figurka již neexistuje.")
-            else:
-                print("Nejsi na tahu.")
-        else:
-            print("The game is over.")
-
+                            
     def jump(self, goal_empty_space):
         global game, game_running, turn, draw_counter
         if game == True:
@@ -255,7 +243,6 @@ class piece:
                                     if self.colour == 1: array = black
                                     else: array = white
                                     array.remove(board[i[1]])
-                                    print([str(obj) for obj in array])
                                     board[i[2]] = self
                                     board[i[1]] = ""
                                     y = self.old_position()
@@ -327,19 +314,7 @@ class piece:
                                                                 if turn != self.colour:
                                                                     have_to_jump = False
                                     break
-                                else:
-                                    print("You can't jump there")
-                            else:
-                                print("This piece can't jump.")
-                    else:
-                        print("A queen can jump") 
-                else:
-                    print("This piece doesn't exist.")        
-            else:
-                print("It's not your turn")
-        else:
-            print("The game is over.")
-
+                            
     def __str__(self):
         return f"{self.name}"
 
