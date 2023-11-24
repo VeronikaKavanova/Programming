@@ -1,0 +1,14 @@
+N = 1
+while True:
+    Zlomek = 1/N
+    Soucet = 0
+    i = 0
+    while i < N:
+        Soucet += Zlomek
+        i += 1
+    if Soucet == 1:
+        print("ok")
+        N += 1
+    else:
+        print("uz se to nerovna:", N)
+        break
