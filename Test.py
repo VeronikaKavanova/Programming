@@ -1,2 +1,2 @@
-print(
-list([[2,3],[4,6]]))
+slovo = "asd"
+print(slovo[0:0])
