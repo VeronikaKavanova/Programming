@@ -18,10 +18,7 @@ def preved_do_n_soustavy(cislo, n):
     prevedene = zbytek + prevedene
     print(prevedene)
 
-n1 = 16
-while True:
-    vstup = input()
-    vstup = preved_z_n_soustavy(vstup,n1)
+print(preved_z_n_soustavy("11101110",2))
 
 vstup = input().split()
 soustava1 = int(vstup[0])

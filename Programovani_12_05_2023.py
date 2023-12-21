@@ -1,4 +1,4 @@
-import Programovani_1_12_05_2023_Pocet_dni as pd
+import Programovani_12_05_2023_Pocet_dni as pd
 import unittest
 
 class TestyData_den( unittest.TestCase ):
