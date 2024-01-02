@@ -24,5 +24,4 @@ def zpracuj_vstup():
 
     return prekazky, start, cil
 
-prekazky, start, cil = zpracuj_vstup()
 

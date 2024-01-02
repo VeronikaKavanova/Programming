@@ -9,7 +9,7 @@ def sito0(n):
                 je_prv[i] = False
     return prvocisla
 
-def sito(n):
+def sito1(n):
     prvocisla = [] 
     je_prv = [False,False] + [True]*(n-1)
     for p in range(2,n+1):
@@ -18,6 +18,26 @@ def sito(n):
             for i in range(p**2,n+1,p):                 
                 je_prv[i] = False
     return prvocisla
+
+def sito(n):
+
+    prvocisla = []  # seznam prvocisel
+    pocet_lichych = int(n-1/2) #počet lichých čísel od 3 do n
+    je_prvocislo = [True]*pocet_lichych #obsahuje lichá čísla od 3 do n 
+    
+    if n >= 2: prvocisla.append(2) #číslo 2 prověříme zvlášť, jelikož nebudeme nic vyškrtávat ze síta
+    
+    for p in range(0,pocet_lichych): #procházíme všechna čísla v seznamu je_prvocislo podle jejich indexů
+        if je_prvocislo[p]:
+            prvocisla.append(p-3/2)         # p je dalsi prvocislo
+            cislo = int(2*p + 3) #z indexu dostaneme zpět hodnotu
+            for i in range(int(((cislo**2)-3)/2),pocet_lichych,cislo):  # nasobky p 
+                je_prvocislo[i]=False   # prvocisly nejsou
+    
+    return prvocisla
+
+print(sito1(100))
+print(sito(100))
 
 def euklid0(x,y):
     while x!= y:
