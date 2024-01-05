@@ -40,7 +40,7 @@ def nejkratsi_cesta(start, cil, prekazky):
                     continue
                 radek = int(policko[0]) + i
                 sloupec = int(policko[1]) + j
-                if (radek and sloupec > 0) and (radek and sloupec < 9): #pokud je pole na šachovnici
+                if (radek > 0 and sloupec > 0) and (radek < 9 and sloupec < 9): #pokud je pole na šachovnici
                     pole = [radek,sloupec]
                     if pole not in prekazky: #a pokud to není překážka
                         sousedni.append(pole) #dá se na něj vstoupit
@@ -49,17 +49,27 @@ def nejkratsi_cesta(start, cil, prekazky):
     fronta = deque() # do fronty budeme ukládat vždy za sebou políčko a cestu, jak jsme se do něj dostali
     fronta.append(start)
     fronta.append([start])
-    navstivena_policka = {} #sem budeme ukládat políčka, na kterých jsme už byli 
-    #a kolik kroků nám trvalo se do nich dostat. To 
+    navstivena_policka = dict() #sem budeme ukládat políčka, na kterých jsme už byli 
+    #a kolik kroků nám trvalo se do nich dostat. To nám usnadní nároky na paměť, jelikož nebudeme generovat méně
+    #efektivní cesty
 
     while len(fronta) != 0:
         policko = fronta.popleft() #další políčko se uloží sem
         sousedni_policka = vygeneruj_sousedni(policko) #vygenerujeme všechna políčka na která se z další můžeme dostat
-        
+    
         for soused in sousedni_policka:
             cesta = list(fronta[0]) #chceme, aby každý soused začal se základní cestou
             if soused not in cesta:
                 cesta.append(soused) #tady se cesta upraví, ale další soused si načte tu starou
+                pocet_kroku = len(cesta) #jak rychle se na dané políčko umíme dostat
+                if tuple(soused) in navstivena_policka:
+                    if navstivena_policka[tuple(soused)] > pocet_kroku:
+                        navstivena_policka[tuple(soused)] = pocet_kroku
+                    else: #tj. na dané políčko už se umíme dostat rychleji nebo stejně rychle, nemá cenu tuto cestu
+                        #generovat
+                        continue
+                else:
+                    navstivena_policka[tuple(soused)] = pocet_kroku
                 if soused == cil:
                     return cesta
                 fronta.append(soused)
