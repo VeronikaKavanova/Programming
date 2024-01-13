@@ -20,4 +20,4 @@ def minmax(config, player):
                 return player
         return (-1)*player
 
-print(minmax([2,2],1))
+print(minmax([7,5,3,1],1))

@@ -62,5 +62,3 @@ else:
         else:
             print(*B)
             print(*A)
-
-

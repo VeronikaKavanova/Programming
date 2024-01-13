@@ -10,7 +10,7 @@ def zaklinadlo_n_pismen(n):
                 generuj(hotovo+pismeno, zbyva-1)
     generuj("", n)
 
-zaklinadlo_n_pismen(2)
+zaklinadlo_n_pismen(4)
 
 #HUBERO KORORO
 #print(26**11*7 + 26**10*20 + 26**9 + 26**8*4 + 26**7*17 + 26**6*14 + 26**5*10 + 26**4*14 + 26**3*17 + 26**2*14 + 26*17 + 15)

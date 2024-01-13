@@ -1,10 +1,9 @@
-def presmycky(slovo, presmycka):
-    if slovo == "":
-        print(presmycka)
-    for i in range(len(slovo)):
-        pismeno = slovo[i]
-        presmycka = presmycka + pismeno
-        presmycka = pismeno + presmycky(slovo[0:i]+slovo[i+1:], presmycka)
-        return presmycka
+def presmycky(slovo, presmycka): #slovo jsou písmena, která nám stále zbývají, přesmyčka je to, co aktuálně tvoříme
+    if slovo == []:
+        print(*presmycka, sep="")
+    else:
+        for pismeno in slovo:
+            presmycka.append(pismeno)            
+            presmycky(), presmycka)
 
-print(presmycky("koza",""))
+print(presmycky(["k","o","z","a"],[]))
