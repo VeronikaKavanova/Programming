@@ -160,6 +160,27 @@ def vygeneruj_sudoku():
 
         return policka
 
+    def zjisti_pocet_policek():
+        """Funkce, která od uživatele zjistí kolik políček, chce mít na začátku v sudoku vyplněných. """
+        #Chceme každopádně získat nějaké vhodné číslo, a proto se uživatele budeme ptát dokud nezadá vhodný vstup.
+        hotovo = False
+        while hotovo == False:
+            znat = input("Kolik si přeješ aby v sudoku bylo vyplněných polí? Zadej číslo od 25 do 81. \n")
+            try:
+                znat = int(znat)
+                if znat < 17:
+                    print("Sudoku s méně než 17 odhalenými číslicemi nikdy nebude mít pouze jedno řešení. Musíš zadat větší číslo.")
+                elif znat > 81:
+                    print("Tolik číslic v sudoku není")
+                #Jelikož používáme elif, znamená to, že znat je větší nebo rovno 17, ale menší než 25. 
+                elif znat < 25:
+                    print("I když sudoku mohou mít takový počet číslic, není jich mnoho a jejich nalezení by mohlo trvat dlouho.")
+                else:
+                    hotovo = True
+            except ValueError:
+                print("Musíš zadat číslo.")
+        return znat
+
     def jedno_reseni(policka, prazdna_policka):
         """Funkce, která zjistí, jestli má dané sudoku právě jedno řešení. Výsledek je True pokud ano, False pokud ne.
         Slouží k zjištění, zda můžeme dané políčko smazat nebo ne.
@@ -177,198 +198,182 @@ def vygeneruj_sudoku():
             nonlocal reseni
             
             #Pokud má nějaké prázdné políčko jen jednu možnou hodnotu, která se do něj může zapsat, je to jediná \
-            #možnost, a tudíž ji tam prostě zapíšeme. 
-            
+            #možnost, a tudíž ji tam prostě zapíšeme. Dál se chceme posunout až pokud už každé políčko má alespoň dvě \
+            #možnosti. Proto budeme procházet všechna políčka, a jakmile do některého pole zapíšeme hodnotu, začneme \
+            #políčka znovu prohledávat od začátku, jelikož se teď jejich situace mohla změnit.
+
             opakovat = True
             while opakovat == True:
                 
+                #Pokud budeme muset pracovat s backtrackingem, budeme chtít pracovat s políčkem s co nejméně možnostmi \
+                #toho, co v něm může být napsáno. Musíme mít proti čemu porovnávat, na začátku je to prostě první políčko, \
+                #toto políčko musíme znovu určit pokaždé když procházíme seznam všech políček, jelikož jsme mezitím mohli \
+                #do tohoto políčka vepsat hodnotu.
                 if prazdna_policka != []:
                     pole_s_nejmene_volbami = prazdna_policka[0]
 
                 for pole in prazdna_policka:
                     
-                    #pokud políčko nemá žádné možnosti, znamená to, že jsme někde při náhodné volbě vybrali špatně, \
-                    #chceme se tedy vrátit do stavu před volbou. To uděláme ukončením volání funkce. Vrátíme False, \
-                    #abychom naznačili, že cesta nevedla k řešení
+                    #Pokud políčko nemá žádné možnosti, znamená to, že už jsme v minimálně druhém volání funkce, a \
+                    #při vepsání jedné z možností jsme vybrali špatně, chceme se tedy vrátit do stavu před volbou. To \
+                    #uděláme ukončením volání funkce. Vrátíme False, abychom naznačili, že cesta nevedla k řešení.
                     if len(pole.mozne_hodnoty) == 0:
                         return False
                         
                     elif len(pole.mozne_hodnoty) == 1:
                         pole.vepis_hodnotu(pole.mozne_hodnoty[0])
-                        #políčko už není prázdné
+                        #Když jsme do pole vepsali hodnotu, tak už není prázdné.
                         prazdna_policka = odstran_hodnotu_ze_seznamu(prazdna_policka, pole)
-                        #zapsali jsme hodnotu a chceme opět zkusit projít všechna políčka, chceme projít i ty, které \
-                        #jsme předtím už prošli, jelikož teď se situace mohla změnit
+                        #Zapsali jsme hodnotu a chceme opět zkusit projít všechna políčka, chceme projít i ty, které \
+                        #jsme předtím už prošli, jelikož teď se situace mohla změnit. Toho dosáhneme opustěním for cyklu \
+                        #což nás vrátí na konec while cyklu. Jelikož opakovat je stále True, začne while cyklus opět od \
+                        #začátku.
                         break
                     
                     else:
+                        #Kontrola pole_s_nejmene_volbami má smysl jen pro pole s dvěma a více volbami, jelikož se bude \
+                        #využívat až když všechny pole mají alespoň dvě volby.
                         if len(pole.mozne_hodnoty) < len(pole_s_nejmene_volbami.mozne_hodnoty):
                             pole_s_nejmene_volbami = pole
                 
                 else:
+                    #Pokud projdeme celým for cyklem, aniž bychom z něj vystoupili pomocí break, znamená to, že žádné pole \
+                    #už nemá jen jednu volbu, a tedy chceme postoupit do další fáze a vystoupit z while cyklu.                    
                     opakovat = False
                     
-            #jakmile skončí for loop, žádné políčko už nemá pouze jednu možnost
+            #Jakmile skončí for cyklus, žádné políčko už nemá pouze jednu možnost.
 
-            #pokud jsme zaplnili všechna políčka, dokončili jsme řešení. 
+            #Pokud jsme zaplnili všechna políčka, dokončili jsme řešení. 
             if prazdna_policka == []:
                 return True
             
-            #Pokud existují políčka s více možnostmi, náhodně jedno vybereme. A postupně prozkoumáme, co se stane, \
-            #když do něj zkusíme vepsat všechny možné hodnoty
+            #Pokud existují políčka s více možnostmi, vezmeme to s co nejméně možnými hodnotami, které do něj je možné \
+            #vepsat. A postupně prozkoumáme, co se stane, když je do něj všechny vepíšeme.
             pole = pole_s_nejmene_volbami
             
             for hodnota in pole.mozne_hodnoty:
                 
-                #print_sudoku(policka)
-                #print(f"index: {policka.index(pole)}. Hodnota: {hodnota}.")
-            
                 pole.vepis_hodnotu(hodnota)
                 nova_prazdna_policka = odstran_hodnotu_ze_seznamu(prazdna_policka, pole)
-                #zkusíme do políčka vepsat tuto hodnotu a rekurzivně prozkoumat, kam to povede
+                #Zkusíme do políčka vepsat hodnotu a rekurzivně prozkoumat, kam to povede.
                 vysledek = unikatni_reseni(policka, nova_prazdna_policka)
-                
-                #print(vysledek)
-
-                #pokud je výsledek True, tak jsme našli řešení, jejich počet se zvětší o 1
+            
+                #Pokud je výsledek True, tak jsme dokončili řešení, počet nalezených řešení se zvětší o 1.
                 if vysledek == True:
                     reseni += 1
             
                 #Zkontrolujeme počet nalezených řešení. Pokud máme alespoň dvě řešení, rovnou volání ukončíme. \
-                #Každé volání, tedy i poslední, od teď vrátí False, protože počet řešení se nemůže zmenšit.
+                #Každé volání, tedy i poslední, od teď vrátí False, protože počet řešení je nelokální a nemůže se zmenšit.
                 if reseni > 1:
                     return False
+
+                #Pokud budeme prozkoumávat další možné cesty, potřebujeme nejprve vymazat vše, co jsme do políček vepsali. \
+                #Tzn. hodnotu kterou jsme zkusili vepsat, a všechny políčka, která jsme vyplnili jako následek tohoto \
+                #vepsání. Všechna tato políčka budou v seznamu předtím prázdných políček, jelikož předtím jsme je \
+                #odstraňovali pouze ze seznamu nova_prazdna_policka.
 
                 for jedno_pole in prazdna_policka:
                     jedno_pole.smaz_hodnotu()
 
-        #nejprve jsme nenašli ani jedno řešení
+        #Nejprve jsme nenašli ani jedno řešení
         reseni = 0
+        #Chceme zjistit kolik najdeme řešení, když budeme danou sudoku zkoumat.
         vysledek = unikatni_reseni(policka, prazdna_policka)
+        #vysledek může být True nebo False nebo None. Funkce vrátí None pokud jsme zkoušeli do jednoho políčka vepsat \
+        #všechny možné hodnoty a přitom jsme nenarazili na dvě řešení. Tzn. že volání se neukončilo vrácením False.
+        #V takovém případě jsme určitě našli jedno řešení, protože kontrolujeme sudoku vzniklou z hotového řešení, tj. \
+        #jedno řešení určitě existuje a druhé jsme nenašli.
         if vysledek == None:
-            if reseni == 1:
-                vysledek = True
-        #během testování jsme do původně prázdných políček zapisovali, chceme vše vrátit do původního stavu
+            vysledek = True
+        
+        #Během zkoumání jsme zapisovali hodnoty do původně prázdných políček. Chceme vše vrátit do původního stavu.
         for pole in prazdna_policka:
             pole.smaz_hodnotu()
 
         return vysledek
     
-        
-        def zjisti_pocet_policek():
-            """Funkce, která od uživatele zjistí kolik počet políček, chce mít na začátku v sudoku vyplněných"""
-            hotovo = False
-            while hotovo == False:
-                znat = input("Kolik si přeješ aby v sudoku bylo vyplněných polí? Zadej číslo od 25 do 81. \n")
-                try:
-                    znat = int(znat)
-                    if znat < 17:
-                        print("Sudoku s méně než 17 odhalenými číslicemi nikdy nebude mít pouze jedno řešení. Musíš zadat větší číslo.")
-                    elif znat > 81:
-                        print("Tolik číslic v sudoku není")
-                    elif znat < 25:
-                        print("I když sudoku mohou mít takový počet číslic, není jich mnoho a jejich nalezení by mohlo trvat dlouho.")
-                    else:
-                        hotovo = True
-                except ValueError:
-                    print("Musíš zadat číslo pomocí číslic.")
-            return znat
+    def odstran_pole(policka, vyplnena_policka, prazdna_policka, odstraneno):
+        """Rekurzivní funkce, která se pokusí rekurzivně odstranit pole. Pokud má sudoku i po odstranění stále právě 
+        jedno řešení, tak se pokusí odstranit další pole.
+        policka: seznam všech políček
+        vyplnena_policka: seznam políček ve kterých je nějaká hodnota
+        prazdna_policka: seznam prázdných políček
+        odstraneno: počet políček, které jsme již odstranili, slouží pro ukončení rekurze
+        """
 
-        def odstran_pole(policka, vyplnena_policka, prazdna_policka, odstraneno: int):
-            """Rekurzivní funkce, která se pokusí rekurzivně odstranit daný počet polí, tak aby stále sudoku mělo právě
-            jedno řešení.
-            Policka: seznam všech políček
-            Vyplnena_policka: seznam políček ve kterých je nějaká hodnota
-            Prazdna_policka: seznam prázdných políček
-            odstraneno: počet políček, které jsme již odstranili
-            """
+        #Funkce bude fungovat podobně jako rekurzivní funkce vypln_pole.
 
-            #pokud jsme již odstranili požadovaný počet políček (uložený v konstantě odstranit), chceme ukončit \
-            #volání všech funkcí
-
-            if odstraneno == odstranit:
-                return policka
-
-            #jeste_nezkuseno bude náš seznam všech políček, které jsme ještě nezkusili odstranit
-            jeste_nezkuseno = vyplnena_policka
-
-            #funkce bude fungovat podobně jako rekurzivní funkce vypln_pole
-            
-            #nejprve ještě nemáme výsledek
-            vysledek = False
-
-            #zkoušíme mazat políčka dokud nenajdeme vyhovující
-            while vysledek == False:
-                
-                #pokud už jsme všechno zkusili a nic nefunguje, problém nastal někdy předtím
-                if jeste_nezkuseno == []:
-                    return False
-    
-                #vybereme náhodné pole a pokusíme se jej odstranit    
-                pole = random.choice(jeste_nezkuseno)
-
-                #print(f"Odstraneno: {odstraneno}, pole: {policka.index(pole)}")
-
-                stara_hodnota = pole.hodnota
-                pole.smaz_hodnotu()
-
-                #updatujeme naše seznamy
-                jeste_nezkuseno = odstran_hodnotu_ze_seznamu(jeste_nezkuseno, pole)
-                nova_prazdna_policka = prazdna_policka + [pole]
-
-                #otestujeme zda dané sudoku má právě jedno řešení 
-                unikatni = jedno_reseni(policka, nova_prazdna_policka)
-                #print_sudoku(policka)
-                #print(unikatni)
-
-                #pokud ne, nemůžeme smazat tohle políčko, a musíme do něj jeho hodnotu vepsat zpátky
-                if unikatni == False:
-                    pole.vepis_hodnotu(stara_hodnota)
-                #pokud ano, můžeme zkusit smazat další políčko
-                else:
-                    nova_vyplnena_policka = odstran_hodnotu_ze_seznamu(vyplnena_policka, pole)
-                    vysledek = odstran_pole(policka, nova_vyplnena_policka, nova_prazdna_policka, odstraneno+1)
-                    if vysledek == False:
-                        pole.vepis_hodnotu(stara_hodnota)
-                    #pokud se nám další pole odstranit nepodaří, výsledek bude stále False a zkusíme místo tohoto nějaké \
-                    #jiné. Pokud dojdeme až na konec výsledek už False nebude a while loop skončí
-
+        #Pokud jsme již odstranili požadovaný počet políček (uložený v konstantě odstranit, kterou definujeme ve funkci \
+        #vygeneruj_sudoku), chceme ukončit rekurzi a vrátit seznam políček napříč všemi voláními.
+        if odstraneno == odstranit:
             return policka
-        
-        #v proměnné policka je uložený seznam všech zatím prázdných políček sudoku    
-        #policka = generuj_prazdnou_sudoku()
-        
-        #do každého políčka uložíme náhodnou možnou hodnotu. Políčka procházíme rekurzivně s použitím backtrackingu
-        #začneme prvním polem
-        #pole = policka[0]
-        #policka = vypln_pole(pole, policka, pole.mozne_hodnoty, 0)
 
-        #na konci seznamu policka je prázdné políčko, které sloužilo jako zarážka pro vypln_pole, toho se nyní můžeme \
-        #zbavit
-        #policka.pop()
+        #jeste_nezkuseno bude náš seznam všech políček, které jsme ještě nezkusili odstranit. Pokaždé když zkusíme nějaké \
+        #pole odstranit, odstraníme ho ze seznamu.
+        jeste_nezkuseno = vyplnena_policka
 
-        #V proměnné znát je počet políček, které mají být vyplněné na začátku 
-        znat = zjisti_pocet_policek()
-        #v proměnné odstranit je počet políček, které musíme vymazat z plně vyplněné sudoku. Proti ní se bude porovnávat \
-        #funkce odstran_pole, která bude kontrolovat, zda už daný počet polí odstranila
-        odstranit = 81 - znat
-
-        #odstartujeme rekurzivní funkci odstran_pole na sudoku, kde jsou všechna pole vyplněná. Na konci bude v seznamu \
-        #policka uloženo sudoku, které může hráč začít řešit
-
+        #Na začátku ještě nemáme výsledek.
         vysledek = False
 
+        #Zkoušíme mazat políčka dokud nenajdeme vyhovující.
         while vysledek == False:
-            policka = generuj_prazdnou_sudoku()
-            policka = generuj_plnou_sudoku(policka)
-            vysledek = odstran_pole(policka, policka, [], 0)
-            print(".")
-        
-        policka = vysledek
-        print_sudoku(policka)
+            
+            #Pokud už jsme zkusili smazat všechna políčka, a nikdy se nám nepodařilo vymazat potřebný počet, problém \
+            #nastal někdy předtím a musíme u předchozího políčka zkusit nějaké jiné.
+            if jeste_nezkuseno == []:
+                return False
 
+            #Z polí, které jsme ještě nezkusili odstranit, vybereme jedno náhodné a pokusíme se jej odstranit    
+            pole = random.choice(jeste_nezkuseno)
+
+            #Jeho hodnotu si uložíme, jelikož pokud zjistíme, že smazání nefunuguje, budeme chtít hodnotu vepsat zpět.
+            stara_hodnota = pole.hodnota
+            pole.smaz_hodnotu()
+
+            jeste_nezkuseno = odstran_hodnotu_ze_seznamu(jeste_nezkuseno, pole)
+            nova_prazdna_policka = prazdna_policka + [pole]
+
+            #Otestujeme zda dané sudoku má právě jedno řešení. 
+            unikatni = jedno_reseni(policka, nova_prazdna_policka)
+
+            #Pokud ne, nemůžeme toto políčko smazat, a musíme do něj jeho hodnotu vepsat zpátky.
+            if unikatni == False:
+                pole.vepis_hodnotu(stara_hodnota)
+            #Pokud ano, můžeme zkusit smazat další políčko.
+            else:
+                nova_vyplnena_policka = odstran_hodnotu_ze_seznamu(vyplnena_policka, pole)
+                
+                #Funkce volá sama sebe. vysledek může být buďto False, pokud jako další nemůžeme smazat žádné políčko.
+                #Nebo seznam políček pokud jsme odstranili potřebný počet políček.
+                vysledek = odstran_pole(policka, nova_vyplnena_policka, nova_prazdna_policka, odstraneno+1)
+                #Pokud je vysledek False, vepíšeme do pole hodnotu zpátky. Vysledek je stále False, a tedy while cyklus
+                #pokračuje a zkusí se jiná hodnota.
+                if vysledek == False:
+                    pole.vepis_hodnotu(stara_hodnota)
+        #Pokud je v proměnné vysledek uložený seznam políček, vysledek už není False. While cyklus skončí a my chceme \
+        #seznam předat předchozímu volání. Tím se postupně všechny volání ukončí a dostaneme zpět hotový seznam políček
         return policka
     
+    #V proměnné policka je uložený seznam všech zatím prázdných políček sudoku. 
+    policka = generuj_prazdnou_sudoku()
+    #V proměnné policka je teď seznam, který odpovídá hotovému řešení sudoku.
+    policka = generuj_plnou_sudoku(policka)
+
+    #V proměnné znát je počet políček, které mají být vyplněné na začátku.
+    znat = zjisti_pocet_policek()
+    #V proměnné odstranit je počet políček, které musíme vymazat z plně vyplněné sudoku. Proti ní se bude porovnávat \
+    #funkce odstran_pole, která bude kontrolovat, zda už daný počet polí odstranila.
+    odstranit = 81 - znat
+
+    #Odstartujeme rekurzivní funkci odstran_pole na sudoku, kde jsou všechna pole vyplněná. Na konci bude v seznamu \
+    #policka uloženo sudoku, které může hráč začít řešit.
+    
+    policka = odstran_pole(policka, policka, [], 0)
+    
+    print_sudoku(policka)
+
+    return policka
+
 def grafika():
     pass
 
