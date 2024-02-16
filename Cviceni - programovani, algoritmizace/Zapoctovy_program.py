@@ -444,7 +444,6 @@ class pole_s_textem:
             x = umisteni%9 * 72
             
             #umisteni//9 říká, ve kterém řádku se nacházíme.
-
             y = umisteni//9 * 72
 
             #Vnitřek políčka začne posunutý o 2, aby nechal prostor pro okraj. x, y jsou souřadnice okraje.
