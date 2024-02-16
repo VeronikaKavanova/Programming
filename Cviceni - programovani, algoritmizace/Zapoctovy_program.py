@@ -6,6 +6,7 @@ Programování NPRG030
 """
 
 import random
+import pygame
 
 def print_sudoku(policka):
     for i in range(81):
@@ -20,13 +21,25 @@ def print_sudoku(policka):
             print()
 
 class policko:
-    """Třída pro jedno políčko v sudoku, o každém políčku je uložena jeho hodnota, seznam jeho sousedů (tj. políček, která 
-    ho ovlivňují) a seznam možných hodnot - tj. čísel, která do políčka můžeme napsat."""
-    def __init__(self, sousedi = None, hodnota = None, mozne_hodnoty = [1,2,3,4,5,6,7,8,9]):
+    """Třída pro jedno políčko v sudoku.
+    self.sousedi: seznam sousedů - políček, které dané políčko ovlivňují - tj. ty ve stejném sloupci, řádku a čtverci 3*3
+    self.hodnota: číslo, které je v políčku napsané
+    self.mozne_hodnoty: seznam možných hodnot - tj. čísel, která do políčka můžeme napsat. 
+    Další tři atributy se budou hodit pro řešení sudoku. Slouží pouze pro grafickou stranu programu.
+    self.je_prazdne: říká jestli je políčko prázdné, a tedy jestli do něj uživatel může zapisovat. 
+    self.vepsana_hodnota: číslo, které uživatel do pole vepsal
+    self.vepsane_mozne_hodnoty: seznam čísel, které uživatel zvažuje jako možné"""
+    def __init__(self, sousedi = None, hodnota = None, mozne_hodnoty = ["1","2","3","4","5","6","7","8","9"]):
         self.sousedi = sousedi
         self.hodnota = hodnota
         self.mozne_hodnoty = mozne_hodnoty
-    
+        #Na začátku atribut je_prazdne nastavíme na False i když to není nejprve pravda. Důvod je ten, že každé pole \
+        #nejprve vyplníme a teprve až potom budeme z nějakých políček mazat jejich hodnoty. Tzn. že každé pole se určitě \
+        #dostane do stavu je_prazdne = False. 
+        self.je_prazdne = False
+        self.vepsana_hodnota = None
+        self.vepsane_mozne_hodnoty = []
+
     def vepis_hodnotu(self, hodnota):
         """Funkce, která změní atribut hodnota daného políčka a odstraní tuto hodnotu z možných hodnot všech sousedů
         tohoto políčka."""
@@ -68,9 +81,9 @@ def odstran_hodnotu_ze_seznamu(seznam, hodnota):
         seznam = seznam[:index_hodnoty] + seznam[index_hodnoty + 1:]
     return seznam
 
-def vygeneruj_sudoku(): 
-    """Funkce, která si řekne uživateli o počet číslic a vygeneruje náhodnou řešitelnou sudoku s takovýmto počtem známých 
-    číslic."""
+def vygeneruj_sudoku(znat: int): 
+    """Funkce, která vygeneruje náhodnou řešitelnou sudoku se zadaným počtem známých číslic.
+    znat: Počet políček, které si uživatel přeje znát."""
 
     def generuj_prazdnou_sudoku():
         """Funkce, která vygeneruje seznam 82 políček sudoku a nadefinuje jejich sousedy.."""
@@ -159,27 +172,6 @@ def vygeneruj_sudoku():
         policka.pop()
 
         return policka
-
-    def zjisti_pocet_policek():
-        """Funkce, která od uživatele zjistí kolik políček, chce mít na začátku v sudoku vyplněných. """
-        #Chceme každopádně získat nějaké vhodné číslo, a proto se uživatele budeme ptát dokud nezadá vhodný vstup.
-        hotovo = False
-        while hotovo == False:
-            znat = input("Kolik si přeješ aby v sudoku bylo vyplněných polí? Zadej číslo od 25 do 81. \n")
-            try:
-                znat = int(znat)
-                if znat < 17:
-                    print("Sudoku s méně než 17 odhalenými číslicemi nikdy nebude mít pouze jedno řešení. Musíš zadat větší číslo.")
-                elif znat > 81:
-                    print("Tolik číslic v sudoku není")
-                #Jelikož používáme elif, znamená to, že znat je větší nebo rovno 17, ale menší než 25. 
-                elif znat < 25:
-                    print("I když sudoku mohou mít takový počet číslic, není jich mnoho a jejich nalezení by mohlo trvat dlouho.")
-                else:
-                    hotovo = True
-            except ValueError:
-                print("Musíš zadat číslo.")
-        return znat
 
     def jedno_reseni(policka, prazdna_policka):
         """Funkce, která zjistí, jestli má dané sudoku právě jedno řešení. Výsledek je True pokud ano, False pokud ne.
@@ -329,6 +321,8 @@ def vygeneruj_sudoku():
             #Jeho hodnotu si uložíme, jelikož pokud zjistíme, že smazání nefunuguje, budeme chtít hodnotu vepsat zpět.
             stara_hodnota = pole.hodnota
             pole.smaz_hodnotu()
+            #Pokud jsme smazali hodnotu, pole je nyní prázdné.
+            pole.je_prazdne = True
 
             jeste_nezkuseno = odstran_hodnotu_ze_seznamu(jeste_nezkuseno, pole)
             nova_prazdna_policka = prazdna_policka + [pole]
@@ -339,6 +333,7 @@ def vygeneruj_sudoku():
             #Pokud ne, nemůžeme toto políčko smazat, a musíme do něj jeho hodnotu vepsat zpátky.
             if unikatni == False:
                 pole.vepis_hodnotu(stara_hodnota)
+                pole.je_prazdne = False
             #Pokud ano, můžeme zkusit smazat další políčko.
             else:
                 nova_vyplnena_policka = odstran_hodnotu_ze_seznamu(vyplnena_policka, pole)
@@ -350,6 +345,7 @@ def vygeneruj_sudoku():
                 #pokračuje a zkusí se jiná hodnota.
                 if vysledek == False:
                     pole.vepis_hodnotu(stara_hodnota)
+                    pole.je_prazdne = False
         #Pokud je v proměnné vysledek uložený seznam políček, vysledek už není False. While cyklus skončí a my chceme \
         #seznam předat předchozímu volání. Tím se postupně všechny volání ukončí a dostaneme zpět hotový seznam políček
         return policka
@@ -360,7 +356,6 @@ def vygeneruj_sudoku():
     policka = generuj_plnou_sudoku(policka)
 
     #V proměnné znát je počet políček, které mají být vyplněné na začátku.
-    znat = zjisti_pocet_policek()
     #V proměnné odstranit je počet políček, které musíme vymazat z plně vyplněné sudoku. Proti ní se bude porovnávat \
     #funkce odstran_pole, která bude kontrolovat, zda už daný počet polí odstranila.
     odstranit = 81 - znat
@@ -374,8 +369,381 @@ def vygeneruj_sudoku():
 
     return policka
 
-def grafika():
-    pass
+#Nastavení barev:
+ZELENA = (80,200,120)
+CERNA = (0,0,0)
+HNEDA = (193,154,107)
+BILA = (255,255,255)
+MODRA = (100,149,237)
 
-policka = vygeneruj_sudoku()
+class pole_s_textem:
+    """Třída pro jakákoli místa na obrazovce, která v sobě budou mít text."""
+    def __init__(self, napis, barva, font = ("Bookman Old Style", 80), je_sudoku = False, barva_textu = CERNA, \
+        barva_okraje = CERNA):
+        self.napis = napis
+        self.barva = barva
+        self.font_tlacitka = pygame.font.SysFont(font[0], font[1])
+        self.barva_textu = barva_textu
+        self.barva_okraje = barva_okraje
+        #Tuto třídu, či její zděděnou třídu tlacitko budeme využívat pro tlačítka, místo na psaní vstupu a políčka v \
+        #sudoku. Pro políčka v sudoku bude zobrazení fungovat o dost jinak, a proto si uložíme atribut je_sudoku, kterým \
+        #rozpoznáme jak, chceme pole zobrazit.
+        self.je_sudoku = je_sudoku
+
+    def zobraz(self, okno, umisteni):
+        """Funkce, která pole zobrazí na Surface - okno na danou pozici.
+        umisteni: pro pole_s_textem, která nejsou políčka sudoku je to tuple, kde první element je střed umístění tlačítka 
+        na ose x, druhý je střed umístění tlačítka na ose y. Pro políčka sudoku je to jen index políčka v seznamu všech
+        políček, ze kterého zjistíme ve kterém sloupci a řádku sudoku se dané políčko nachází."""
+        #Napíše nápis na Surface objekt text
+        text = self.font_tlacitka.render(self.napis, False, self.barva_textu)
+        
+        #Pro tlačítka a prostor pro psaní vstupu využijeme širší okraj, fixní výšku, a šířku, která se bude odvíjet od \
+        #délky textu.
+        if self.je_sudoku == False:
+            #Tyto rozměry sirka a vyska jsou rozměry celého prostoru. Chceme, aby prostor byl větší než text.
+            sirka = text.get_width() + 40
+            vyska = 120
+            #prostor je Rect objekt, je to vyplnění.
+            prostor = pygame.draw.rect(okno, self.barva, (umisteni[0] - sirka//2, umisteni[1] - vyska//2, sirka, vyska))
+            #okraj je Rect objekt, tvoří okraj prostoru. Je lehce posunutý a větší než prostor, aby byl okraj vidět.
+            okraj = pygame.draw.rect(okno, self.barva_okraje, (umisteni[0] - sirka//2 - 2, umisteni[1] - vyska//2 - 2, \
+                sirka + 2, vyska + 2), 4)
+
+            #text_rect je Rect objekt který zabírá stejnou velikost jako text a je umístěný uprostřed prostoru.
+            text_rect = text.get_rect(center = prostor.center)
+            #Text nakreslíme na obrazovku.
+            okno.blit(text, text_rect)
+
+        #Pro políčka sudoku využijeme danou výšku a šířku, užší okraj a u vepisování více možných hodnot i kontrolu, \
+        #zda se vše vejde na řádek.
+        else:
+            sirka = 70
+            vyska = 70
+            #Pořadí%9 říká, ve kterém sloupci se nacházíme. 71 je šířka jednoho políčka + jeho levého okraje. Pravý okraj \
+            #chceme, aby se překrýval s levým okrajem tohoto políčka
+            x = umisteni%9 * 72
+            #Pořadí//9 říká, ve kterém řádku se nacházíme. 71 je výška jednoho políčka + jeho horního okraje. Dolní okraj \
+            #chceme, aby se překrýval s horním okrajem tohoto políčka. 
+            y = umisteni//9 * 72
+
+            #Vnitřek políčka začne posunutý o 1, aby nechal prostor pro okraj. x, y jsou souřadnice okraje.
+            tlacitko = pygame.draw.rect(okno, self.barva, (x + 2, y + 2, sirka, vyska))
+            #Souřadnice okraje jsou x, y. Sirka, vyska je velikost vnitřku, takže ji musíme posunout.
+            okraj = pygame.draw.rect(okno, self.barva_okraje, (x, y, sirka + 4, vyska + 4), 2)
+            
+            #Pokud zobrazujeme možné hodnoty a je jich víc než 5, tak se nevejdou na jeden řádek, a proto vytvoříme dva \
+            #Rect objekty.
+            if len(self.napis) > 9:
+                text0 = self.font_tlacitka.render(self.napis[:9], False, self.barva_textu)
+                text1 = self.font_tlacitka.render(self.napis[10:], False, self.barva_textu)
+
+                text0_rect = text0.get_rect(center = (tlacitko.centerx, 27))
+                text1_rect = text1.get_rect(center = (tlacitko.centerx, 47))
+
+                okno.blit(text0, text0_rect)
+                okno.blit(text1, text1_rect)
+
+            else:
+                text = self.font_tlacitka.render(self.napis, False, self.barva_textu)
+                text_rect = text.get_rect(center = tlacitko.center)
+
+                okno.blit(text, text_rect)
+
+        #okraj je rect objekt, který je největší a zabírá plochu celého pole. Toto není důležité pro pole_s_textem, ale \
+        #bude se to hodit pro zděděnou třídu tlacitko. Proto si tento okraj vrátíme.
+        return okraj
+
+class tlacitko(pole_s_textem):
+    """Třída pro tlačítka, která budou pole_s_textem na která jde navíc i kliknout."""
+
+    def __init__(self, napis, barva, font = ("Bookman Old Style", 80), je_sudoku = False, barva_textu = CERNA, \
+        barva_okraje = CERNA):
+        super().__init__(napis, barva, font, je_sudoku, barva_textu, barva_okraje)
+        #Ukládáme si Rect objekt, který se nám bude hodit k detekování toho, zda na tlačítko bylo kliknuto. 
+        self.rect = None
+
+    def zobraz(self, okno, umisteni):
+        """Funkce zobraz zobrazí tlačítko na okno na danou pozici stejně jako funkce zobraz třídy pole_s_textem. Zároveň
+        si ale ještě do nového atributu rect uloží Rect objekt, který tlačítku odpovídá."""
+        okraj = pole_s_textem.zobraz(self, okno, umisteni)
+        #Ukládáme si Rect objekt, který se nám bude hodit k detekování toho, zda na tlačítko bylo kliknuto. 
+        self.rect = okraj
+
+    def bylo_zmacknuto(self, kurzor):
+        """Funkce, která zkontroluje, zda je pozice kurzoru - předaná v proměnné kurzor - na tlačítku. Vrací False pokud
+        ne a True pokud ano."""
+        #V atributu self.rect je Rect objekt s pozicí na které byl naposled vykreslen.
+        if self.rect.collidepoint(kurzor):
+            return True
+        else:
+            return False
+
+class prazdne_pole_sudoku(tlacitko):
+    """Prázdná políčka v sudoku jsou také tlačítka. Je na ně potřeba umět kliknout. Chceme aby se políčka chovala trochu
+    jinak než tlačítka, a proto jsme pro ně vytvořili speciální třídu."""
+    def __init__(self, pole: policko):
+        #Uložíme si příslušný objekt, abychom kdykoli měli přístup k jeho atributům.
+        self.pole = pole
+        self.barva = BILA
+        self.je_sudoku = True
+        self.barva_textu = MODRA
+        font = ("Arial", 70)
+        #Pokud uživatel do pole vepsal jednu hodnotu, chceme zobrazit tu.
+        if pole.vepsana_hodnota != None:
+            self.napis = pole.vepsana_hodnota
+        #Pokud nemá vepsanou jednu hodnotu, ale má nějaké možnosti, tak chceme zobrazit ty.
+        elif pole.vepsane_mozne_hodnoty != []:
+            #Vytvoříme jeden textový řetězec ze všech čísel.
+            self.napis = " ".join(str(cislo) for cislo in pole.vepsane_mozne_hodnoty)
+            #Pokud budeme zobrazovat vepsané možné hodnoty, chceme, aby byly vepsány menším písmem. Proto změníme font.
+            font = ("Arial", 20)
+        #Pokud o poli nemá poznamenáno nic, tak se zobrazí prázdné.
+        else:
+            self.napis = ""
+        super().__init__(self.napis, self.barva, font, self.je_sudoku, self.barva_textu)
+            
+def hra():
+    """Funkce, která spustí celou hru. Dokud běží program, tak běží hra."""
+    
+    def zkontroluj_pocet_policek(vstup):
+        """Funkce, která zkontroluje zda počet políček zadaný uživatelem je vhodný. Jako první argument vrací vysledek - 
+        False, pokud vstup vhodný není, True pokud je. Druhý argument je zprava, která se uživateli zobrazí."""
+        znat = vstup
+        try:
+            znat = int(znat)
+            if znat < 17:
+                zprava = "Sudoku s méně než 17 odhalenými číslicemi nikdy nebude mít pouze jedno řešení. Musíte zadat větší číslo."
+                vysledek = False
+            elif znat > 81:
+                zprava = "Tolik číslic v sudoku není."
+                vysledek = False
+            #Jelikož používáme elif, znamená to, že znat je větší nebo rovno 17, ale menší než 25. 
+            elif znat < 25:
+                zprava = "I když sudoku mohou mít takový počet číslic, není takových sudoku mnoho a jejich nalezení by mohlo trvat příliš dlouho. Zadejte prosím větší číslo."
+                vysledek = False
+            else:
+                zprava = "Děkujeme. Vaše sudoku se právě generuje."
+                vysledek = True
+        except ValueError:
+            zprava = "Musíte zadat číslo."
+            vysledek = False
+        return vysledek, zprava
+
+    def zobraz_text(okno, text, pozice):
+        """Funkce, která zobrazí text na obrazovku tak, aby se podle potřeby rozložil do řádků.
+        okno: Surface na který zobrazujeme
+        text: text, který zobrazujeme
+        pozice: pozice na které se začne text zobrazovat"""
+
+        font_text = pygame.font.SysFont("Bookman Old Style", 60)
+
+        #Chceme text rozdělovat po slovech. Vytvoříme si seznam slova, ve kterém každý prvek odpovídá jednomu slovu v textu.
+        slova = text.split() 
+
+        #V proměnné mezera si uložíme šířku mezery, to bude důležité pro upravování pozice.
+        mezera = font_text.size(" ")[0]        
+        #V proměnné max_sirka si uložíme šířku obrazovky, která nám říká jaké max hodnoty může nabývat x souřadnice.
+        max_sirka = okno.get_size()[0]
+
+        #Souřadnice x, y se budou neustále měnit, jak budeme psát jednotlivá slova.
+        x, y = pozice
+
+        for slovo in slova:
+            #Vytvoříme Surface objekt s textem. To nám umožní zjistit o něm informace a následně ho nakreslit na obrazovku. 
+            slovo_surf = font_text.render(slovo, False, CERNA)
+            #Zjistíme jeho velikost, ta nám pomůže zjistit o kolik máme posunout souřadnice x a y.
+            sirka_slova, vyska_slova = slovo_surf.get_size()
+            #Pokud už se toto slovo na současný řádek nevejde. Chceme ho napsat na začátek nového řádku. Tzn. resetovat \
+            #souřadnici x a zvětšit souřadnici y o výšku slova.
+            if x + sirka_slova >= max_sirka:
+                x = pozice[0]
+                y += vyska_slova
+            okno.blit(slovo_surf, (x,y))
+            #Jelikož jsme slovo napsali, musíme k souřadnici x připočíst jeho délku a délku jedné mezery, kterou bychom \
+            #za slovo jakoby napsali. 
+            x += sirka_slova + mezera
+
+    #Při spuštění programu je program zapnutý. Okno hry bude zapnuto a aktualizováno, dokud bude program běžet.
+    zapnuto = True
+
+    #Pokud je priprava True, tak jsme ve fázi, že hra chce od uživatele zjistit kolik chce v sudoku znát číslic. Na \
+    #začátku jsme v hlavním menu, a proto je toto False.
+    priprava = False
+
+    #Pokud je reseni True, tak jsme ve fázi, kdy uživatel může řešit sudoku. Na začátku je toto False.
+    reseni = False
+
+    #Inicializuje pygame moduly.
+    pygame.init()
+
+    #Nastaví velikost okna na velikost monitoru. 
+    info_objekt = pygame.display.Info()
+    sirka_obrazovky, vyska_obrazovky = info_objekt.current_w, info_objekt.current_h
+    okno = pygame.display.set_mode((sirka_obrazovky, vyska_obrazovky))
+    
+    #Získáme informace o prostředku obrazovky pro pozicování aspektů. 
+    prostredek_x = okno.get_rect().centerx
+    prostredek_y = okno.get_rect().centery
+
+    while zapnuto == True:
+
+        #Neustále kontrolujeme jestli nebylo něco zmáčknuto.
+        for event in pygame.event.get():
+            #Pokud bylo zmáčknuté levé tlačítko myši, chceme zkontrolovat kde se nachází kurzor a zda bylo zmáčknuto \
+            #některé tlačítko.            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    kurzor = pygame.mouse.get_pos()
+                    #Pokud bylo zmáčnuto tlačítko ukoncit, chceme celý program ukončit. Toho dosáhneme změněním hodnoty \
+                    #zapnuto, čímž skončí hlavní while cyklus.
+                    vypnout = ukoncit.bylo_zmacknuto(kurzor)
+                    if vypnout == True:
+                        zapnuto = False
+                    #Pokud bylo zmáčknuto tlačítko nove, chceme spustit druhou fázi, kdy se program ptá uživatele na počet \
+                    #číslic. To naznačíme změnou hodnoty priprava na True.
+                    generovat = nove.bylo_zmacknuto(kurzor)
+                    if generovat == True:
+                        priprava = True
+
+        #Vybarví celé okno světle hnědou barvou.
+        okno.fill(HNEDA)
+
+        #Zobrazí hlavní nadpis
+        font_nadpis = pygame.font.SysFont("Harrington", 200)
+        nazev = font_nadpis.render("SUDOKU", False, CERNA)
+        okno.blit(nazev, nazev.get_rect(centerx = prostredek_x, centery = vyska_obrazovky//5))
+        
+        nove = tlacitko("Nové sudoku", ZELENA)
+        nove.zobraz(okno, (prostredek_x, vyska_obrazovky//2))    
+        ukoncit = tlacitko("Ukončit program", ZELENA)
+        ukoncit.zobraz(okno, (prostredek_x, 3*vyska_obrazovky//4))
+
+        #Zobrazí všechny změny.
+        pygame.display.flip()
+        
+        #V proměnné vstup je vše, co zatím uživatel zadal. Na začátku je to nic.
+        vstup = ""
+        
+        #Pokud jsme ve fázi priprava, tak chceme zde uživatele držet dokud nám nezadá platný počet číslic, které chce znát.
+        while priprava == True:
+
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        kurzor = pygame.mouse.get_pos()
+                        vypnout = ukoncit.bylo_zmacknuto(kurzor)
+                        if vypnout == True:
+                            #Pokud bylo zmáčknuto tlačítko ukoncit, chceme vypnout celý program, proto musíme nejprve \
+                            #ukončit aktuální fázi přípravy.
+                            priprava = False
+                            zapnuto = False
+                
+                #Pokud bylo zmáčknuto tlačítko na klávesnici, zvlášť nás zajímá stisknutí klávesy backspace, \
+                #kterou se bude vstup vymazávat, a klávesy enter, kterou se vstup bude potvrzovat. Zbytek kláves \
+                #převedeme na textový řetězec.
+                elif event.type == pygame.KEYDOWN:
+                    #Pokud uživatel stiskl enter, chceme odeslat vstup na zkontrolování funkci zkontroluj_pocet_policek.
+                    if event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
+                        vysledek, zprava = zkontroluj_pocet_policek(vstup)
+
+                        #Pokud vstup nebyl vhodný pokračujeme v této fázi a resetujeme vstup.                        
+                        if vysledek == False:
+                            
+                            #Nejprve chceme uživateli ukázat zprávu. Zpráva se bude zobrazovat, dokud uživatel neklikne \
+                            #na tlačítko ok, nebo program nevypne.
+                            koukame_na_zpravu = True
+                            while koukame_na_zpravu == True:
+
+                                for event in pygame.event.get():
+                                    if event.type == pygame.MOUSEBUTTONDOWN:
+                                        if event.button == 1:
+                                            kurzor = pygame.mouse.get_pos()
+                                            vypnout = ukoncit.bylo_zmacknuto(kurzor)
+                                            if vypnout == True:
+                                                #Pokud bylo zmáčknuto tlačítko ukoncit, chceme vypnout celý program, proto musíme \
+                                                #nejprve ukončit koukání na zprávu, fázi přípravy a celý program.
+                                                koukame_na_zpravu = False
+                                                priprava = False
+                                                zapnuto = False
+                                            #Pokud uživatel kliknul na tlačítko ok, chceme se vrátit zpět k vepisování vstupu.
+                                            odkliknuto = ok.bylo_zmacknuto(kurzor)
+                                            if odkliknuto == True:
+                                                koukame_na_zpravu = False
+
+                                okno.fill(HNEDA)
+                                zobraz_text(okno, zprava, (20,20))
+
+                                ok = tlacitko("OK", ZELENA)
+                                ok.zobraz(okno, (prostredek_x, prostredek_y))
+
+                                ukoncit.zobraz(okno, (prostredek_x, 4*vyska_obrazovky//5))
+
+                                pygame.display.flip()
+
+                            #Jakmile uživatel odkliknul zprávu, vracíme se zpět, opět s prázdným vstupem.
+                            vstup = ""
+
+                        #Pokud byl vstup vhodný můžeme sudoku vygenerovat.
+                        else:
+                            #Nejprve chceme zobrazit zprávu. Ta se bude ukazovat po celou dobu generování sudoku.
+                            okno.fill(HNEDA)
+                            zobraz_text(okno, zprava, (20,20))
+                            ukoncit.zobraz(okno, (prostredek_x, 4*vyska_obrazovky//5))
+                            pygame.display.flip()
+
+                            #Vygenerujeme sudoku podle požadavků. Číslo je uloženo jako string v proměnné vstup.
+                            policka = vygeneruj_sudoku(int(vstup))
+
+                            #Jakmile sudoku vygenerujeme, chceme ukončit fázi přípravy a začít fázi řešení.
+                            priprava = False
+                            reseni = True
+
+                    #Pokud uživatel stiskl backspace, chceme odstranit ze vstupu poslední znak.
+                    elif event.key == pygame.K_BACKSPACE:
+                        vstup = vstup[:-1]
+                    else:
+                        vstup += event.unicode
+
+            okno.fill(HNEDA)
+
+            instrukce = "Kolik si přejete aby v sudoku bylo vyplněných polí? Zadej číslo od 25 do 81. Číslo napište číslicemi. Vstup potvrďte klávesou enter. Svůj vstup můžete vymazat klávesou backspace."
+            zobraz_text(okno, instrukce, (20,20))
+
+            #prostor_pro_uzivatele je okénko ve kterém se bude zobrazovat vše, co uživatel napíše. 
+            prostor_pro_uzivatele = pole_s_textem(vstup, HNEDA)
+            prostor_pro_uzivatele.zobraz(okno, (prostredek_x, 6*vyska_obrazovky//11))
+
+            ukoncit.zobraz(okno, (prostredek_x, 4*vyska_obrazovky//5))
+            
+            pygame.display.flip()
+        
+        #Pokud jsme ve fázi řešení, tak zde zůstaneme dokud uživatel program neukončí, nebo si nenechá vygenerovat nové \
+        #sudoku.
+        while reseni == True:
+            okno.fill(HNEDA)
+            #Vytvoříme si surface pro sudoku tabulku. Na ní si uspořádáme políčka a pak jen celou tabulku umístíme na \
+            #obrazovku.
+            #tabulka = pygame.Surface((650,650))
+
+            #okno.blit(tabulka, tabulka.get_rect())
+
+            for i in range(81):
+                pole = policka[i]
+                #Pokud je pole vyplněné, uživatel do něj psát nemůže. Nebude to tedy vůbec tlačítko, ale pole s textem.
+                if pole.je_prazdne == False:
+                    pole_sudoku = pole_s_textem(pole.hodnota, BILA, font=("Arial", 70), je_sudoku = True)
+                #Pokud je pole prázdné, chceme, aby pole bylo tlačítko, dalo se na něj klikat a psát do něj. 
+                else:
+                    pole_sudoku = prazdne_pole_sudoku(pole)
+                #Jelikož jde o sudoku stačí jako argument umístění uvést jen pořadí políčka.
+                pole_sudoku.zobraz(okno, i)
+
+
+            pygame.display.flip()
+
+
+hra()
+
+#policka = vygeneruj_sudoku()
 
