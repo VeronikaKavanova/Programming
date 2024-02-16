@@ -48,6 +48,4 @@ def generuj_druhym_zpusobem(policka, prazdna_policka, hotovo):
 
     return policka
 
-vepsane_mozne_hodnoty = [1,2,3]
-napis = " ".join(str(cislo) for cislo in vepsane_mozne_hodnoty)
-print(napis)
+print(-1//3)
