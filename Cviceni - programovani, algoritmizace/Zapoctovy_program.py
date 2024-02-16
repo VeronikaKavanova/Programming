@@ -13,7 +13,9 @@ class policko:
     self.sousedi: seznam sousedů - políček, které dané políčko ovlivňují - tj. ty ve stejném sloupci, řádku a čtverci 3*3
     self.hodnota: číslo, které je v políčku napsané
     self.mozne_hodnoty: seznam možných hodnot - tj. čísel, která do políčka můžeme napsat. 
-    Další čtyři atributy se budou hodit pro řešení sudoku. Slouží pouze pro grafickou stranu programu.
+    Dalších pět atributy se budou hodit pro řešení sudoku. Slouží pouze pro grafickou stranu programu.
+    self.spravna_hodnota: zde bude uložená hodnota, která by se v políčku měla nacházet. Uloží se zde, jakmile bude \
+        vytvořeno řešení
     self.je_prazdne: říká jestli je políčko prázdné, a tedy jestli do něj uživatel může zapisovat. 
     self.vepsana_hodnota: číslo, které uživatel do pole vepsal
     self.vepsane_mozne_hodnoty: seznam čísel, které uživatel zvažuje jako možné
@@ -26,6 +28,7 @@ class policko:
         #Na začátku atribut je_prazdne nastavíme na False i když to není nejprve pravda. Důvod je ten, že každé pole \
         #nejprve vyplníme a teprve až potom budeme z nějakých políček mazat jejich hodnoty. Tzn. že každé pole se určitě \
         #dostane do stavu je_prazdne = False. 
+        self.spravna_hodnota = None
         self.je_prazdne = False
         self.vepsana_hodnota = None
         self.vepsane_mozne_hodnoty = []
@@ -171,6 +174,10 @@ def vygeneruj_sudoku(znat: int):
         policka = vypln_pole(pole, policka, 0)
         #82. políčko v seznamu tam bylo pouze jako zarážka pro funkci vypln_pole a proto se ho teď můžeme zbavit.
         policka.pop()
+
+        #Teď jsme získali hotové řešení. Chceme si ho uložit, aby mohla být implementována kontrola hráčova řešení.
+        for pole in policka:
+            pole.spravna_hodnota = pole.hodnota
 
         return policka
 
@@ -501,6 +508,13 @@ class prazdne_pole_sudoku(tlacitko):
         self.pole = pole
         self.barva = BILA
         self.je_sudoku = True
+        #Dokud máme přístup i k objektu třídy policko, můžeme prozkoumat, zda je hodnota vepsaná v políčku správná. \
+        #Výsledek tohoto prozkoumání si uložíme do atributu je_spravne. Pokud v políčku není nic vepsáno, atribut \
+        #bude roven True, jelikož není potřeba uživateli oznamovat, že nevyplněná políčka jsou špatně.
+        if pole.vepsana_hodnota == pole.spravna_hodnota or pole.vepsana_hodnota == None:
+            self.je_spravne = True
+        else:
+            self.je_spravne = False
         self.barva_textu = MODRA
         font = ("Arial", 70)
         #Pokud uživatel do pole vepsal jednu hodnotu, chceme zobrazit tu.
@@ -516,6 +530,16 @@ class prazdne_pole_sudoku(tlacitko):
         else:
             self.napis = ""
         super().__init__(self.napis, self.barva, font, self.je_sudoku, self.barva_textu)
+
+    def zobraz(self, okno, umisteni, kontrolovat):
+        super().zobraz(okno, umisteni)
+        #Pokud je zapnutá kontrola a hodnota v políčku není správně, chceme to uživateli naznačit přeškrtuntím.
+        if kontrolovat == True:
+            if self.je_spravne == False:
+                x = umisteni%9 * 72 + 1
+                y = umisteni//9 * 72 + 1
+                pygame.draw.line(okno, (255,0,0), (x,y), (x+70, y+70), 4)
+
 
 def hra():
     """Funkce, která spustí celou hru. Dokud běží program, tak běží hra."""
@@ -534,7 +558,7 @@ def hra():
                 vysledek = False
             #Jelikož používáme elif, znamená to, že znat je větší nebo rovno 17, ale menší než 26. 
             elif znat < 26:
-                zprava = "I když sudoku mohou mít takový počet číslic, není takových sudoku mnoho a jejich nalezení by mohlo trvat příliš dlouho. Zadejte prosím větší číslo."
+                zprava = "Sudoku s tímto počtem odhalených číslic není mnoho a jejich nalezení by mohlo trvat příliš dlouho. Zadejte prosím větší číslo."
                 vysledek = False
             else:
                 zprava = "Děkujeme. Vaše sudoku se právě generuje."
@@ -724,7 +748,7 @@ def hra():
 
             okno.fill(HNEDA)
 
-            instrukce = "Kolik si přejete aby v sudoku bylo vyplněných polí? Zadej číslo od 26 do 81. Číslo napište číslicemi. Vstup potvrďte klávesou enter. Svůj vstup můžete vymazat klávesou backspace."
+            instrukce = "Kolik si přejete, aby v sudoku bylo vyplněných polí? Zadejte číslo od 26 do 81. Číslo napište číslicemi. Vstup potvrďte klávesou enter. Svůj vstup můžete vymazat klávesou backspace."
             zobraz_text(okno, instrukce, (20,20))
 
             #prostor_pro_uzivatele je okénko ve kterém se bude zobrazovat vše, co uživatel napíše. 
@@ -818,6 +842,9 @@ def hra():
                                         aktivni_policko.vepsane_mozne_hodnoty, zmacknuto)
                                 else:
                                     aktivni_policko.vepsane_mozne_hodnoty.append(zmacknuto)
+                                    #Pro pohldnost hráče, hodnoty vždy seřadíme, aby bylo jasně vidět, které hodnoty \
+                                    #tam jsou vepsané a které ne.
+                                    aktivni_policko.vepsane_mozne_hodnoty.sort()
 
             okno.fill(HNEDA)
             
@@ -831,19 +858,21 @@ def hra():
                 #Pokud je pole vyplněné, uživatel do něj psát nemůže. Nebude to tedy vůbec tlačítko, ale pole s textem.
                 if pole.je_prazdne == False:
                     pole_sudoku = pole_s_textem(pole.hodnota, BILA, font=("Arial", 70), je_sudoku = True)
+                    #Jelikož jde o sudoku stačí jako argument umístění uvést jen pořadí políčka.
+                    pole_sudoku.zobraz(tabulka, i)
                 #Pokud je pole prázdné, chceme, aby pole bylo tlačítko, dalo se na něj klikat a psát do něj. 
                 else:
                     pole_sudoku = prazdne_pole_sudoku(pole)
                     #Uložíme si objekt pole_sudoku do atributu políčka, abychom k němu mohli mít i nadále přístup.
-                    pole.pole_sudoku = pole_sudoku    
-                #Jelikož jde o sudoku stačí jako argument umístění uvést jen pořadí políčka.
-                pole_sudoku.zobraz(tabulka, i)
+                    pole.pole_sudoku = pole_sudoku
+                    pole_sudoku.zobraz(tabulka, i, kontrolovat)
+
 
             #Pokud máme nějaké políčko zvýrazněné, musíme jeho pozadí přebarvit na žlutou.
             if aktivni_policko != None:
                 index_pole = policka.index(aktivni_policko)
                 aktivni_policko.pole_sudoku.barva = SVETLE_ZLUTA
-                aktivni_policko.pole_sudoku.zobraz(tabulka, index_pole)
+                aktivni_policko.pole_sudoku.zobraz(tabulka, index_pole, kontrolovat)
 
             #Nakreslíme silnější okraje mezi čtverci 3*3.
             for i in range(4):
@@ -883,6 +912,5 @@ def hra():
             ukoncit.zobraz(okno, (3*sirka_obrazovky//4, 8*vyska_obrazovky//9))
 
             pygame.display.flip()
-
 
 hra()
