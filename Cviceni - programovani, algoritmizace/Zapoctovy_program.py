@@ -451,10 +451,11 @@ class pole_s_textem:
                 text0 = self.font_tlacitka.render(self.napis[:9], False, self.barva_textu)
                 text1 = self.font_tlacitka.render(self.napis[10:], False, self.barva_textu)
 
-                text0_rect = text0.get_rect(center = (tlacitko.centerx, 27))
-                text1_rect = text1.get_rect(center = (tlacitko.centerx, 47))
+                text0_rect = text0.get_rect(center = (tlacitko.centerx, tlacitko.centery - 10))
 
                 okno.blit(text0, text0_rect)
+                text1_rect = text1.get_rect(center = (tlacitko.centerx, tlacitko.centery + 10))
+
                 okno.blit(text1, text1_rect)
 
             else:
