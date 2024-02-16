@@ -540,7 +540,6 @@ class prazdne_pole_sudoku(tlacitko):
                 y = umisteni//9 * 72 + 1
                 pygame.draw.line(okno, (255,0,0), (x,y), (x+70, y+70), 4)
 
-
 def hra():
     """Funkce, která spustí celou hru. Dokud běží program, tak běží hra."""
     
@@ -905,7 +904,6 @@ def hra():
             else:
                 kontrola = tlacitko("Kontrola: ON", ORANZOVA)
             kontrola.zobraz(okno, (3*sirka_obrazovky//4, 5*vyska_obrazovky//7))
-
 
             #Zobrazíme tlačítka pro vygenerování nového sudoku a vypnutí programu.
             nove.zobraz(okno, (sirka_obrazovky/5, 8*vyska_obrazovky//9))
