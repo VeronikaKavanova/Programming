@@ -378,7 +378,12 @@ CERNA = (0,0,0)
 HNEDA = (193,154,107)
 BILA = (255,255,255)
 MODRA = (100,149,237)
-ZLUTA = (255,255,51)
+SVETLE_ZLUTA = (255,255,51)
+FIALOVA = (191,148,228)
+CERVENA = (233,150,122)
+ORANZOVA = (218,165,32)
+ZLUTA = (255,255,0)
+SVETLE_MODRA = (135,206,250)
 
 class pole_s_textem:
     """Třída pro jakákoli místa na obrazovce, která v sobě budou mít text."""
@@ -425,38 +430,17 @@ class pole_s_textem:
             #sirka a vyska jsou rozměry našeho políčka
             sirka = 70
             vyska = 70
+
             #Jelikož jsou v seznamu políčka uspořádaná po řádcích, umisteni%9 nám dá sloupec ve kterém se toto políčko \
-            #nachází.
-            sloupec = umisteni%9
-            #72 je šířka jednoho políčka + obyčejného levého okraje. Pravý okraj chceme, aby se překrýval s levým okrajem \
+            #nachází. 72 je šířka jednoho políčka + levého okraje. Pravý okraj chceme, aby se překrýval s levým okrajem \
             #tohoto políčka
-            x = sloupec * 72
-            #K x potřebujeme přičíst rozdíl mezi velkým a malým okrajem vynásobený počtem velkých okrajů. Úzké okraje \
-            #uvnitř čtverců jsou 2 pixely, okraje na kraji čtverců mají 4 pixely. Tzn. že přičteme 2*počet nakreslených \
-            #velkých okrajů.
+            x = umisteni%9 * 72
             
-            #Pokud jsme v jednom z předposledních dvou sloupců, už byly nakresleny tři velké okraje.
-            if sloupec > 6:
-                x += 6
-            elif sloupec > 3:
-                x += 4
-            elif sloupec > 0:
-                x += 2
-        
             #umisteni//9 říká, ve kterém řádku se nacházíme.
-            radek = umisteni//9
 
-            #Jinak bude výpočet horních okrajů fungovat stejně. 
-            y = radek * 72
+            y = umisteni//9 * 72
 
-            if radek > 6:
-                y += 6
-            elif radek > 3:
-                y += 4
-            elif radek > 0:
-                y += 2
-
-            #Vnitřek políčka začne posunutý o 1, aby nechal prostor pro okraj. x, y jsou souřadnice okraje.
+            #Vnitřek políčka začne posunutý o 2, aby nechal prostor pro okraj. x, y jsou souřadnice okraje.
             tlacitko = pygame.draw.rect(okno, self.barva, (x + 2, y + 2, sirka, vyska))
             #Souřadnice okraje jsou x, y. Sirka, vyska je velikost vnitřku, takže ji musíme posunout.
             okraj = pygame.draw.rect(okno, self.barva_okraje, (x, y, sirka + 4, vyska + 4), 2)
@@ -756,6 +740,15 @@ def hra():
         #Proměnná aktivni_policko nám říká s kterým políčkem chce uživatel právě pracovat, na začátku to není žádné.
         aktivni_policko = None
 
+        #Ve fázi řešení jsou tři hlavní módy, psaní hodnot, psaní možností, a vymazávání. Ve kterém módu se nacházíme \
+        #bude uloženo v proměnné mod. Bude nabývat hodnot 1-3, které po řadě odpovídají jednotlivým módům. Na začátku \
+        #je spuštěn mód vpisování hodnot.
+        mod = 1
+
+        #Krom tří různých módu, také může být zapnutý nebo vypnutý mód kontroly, který kontroluje vepsané hodnoty, a \
+        #zvýrazňuje ty špatné. Tento mód je automaticky vypnutý.
+        kontrolovat = False
+
         while reseni == True:
             
             for event in pygame.event.get():
@@ -771,9 +764,24 @@ def hra():
                         #Pokud bylo zmáčknuto tlačítko generovat, chceme se vrátit zpět do fáze přípravy. Proto musíme \
                         #nejprve ukončit fázi řešení.
                         generovat = nove.bylo_zmacknuto(kurzor)
+                        #Zkontrolujeme, jestli bylo zmáčknuto některé tlačítko módů.
                         if generovat == True:
                             reseni = False
                             priprava = True
+                        mod_1 = vepsat.bylo_zmacknuto(kurzor)
+                        if mod_1 == True:
+                            mod = 1
+                        mod_2 = poznamky.bylo_zmacknuto(kurzor)
+                        if mod_2 == True:
+                            mod = 2
+                        mod_3 = vymazat.bylo_zmacknuto(kurzor)
+                        if mod_3 == True:
+                            mod = 3
+                        #Dále zkontrolujeme jestli byla zmáčknuta kontrola. Pokud ano, tak chceme změnit hodnotu \
+                        #kontrolovat. Toho dosáhneme logickou operací not.
+                        prepnout = kontrola.bylo_zmacknuto(kurzor)
+                        if prepnout == True:
+                            kontrolovat = not(kontrolovat)
                         #Musíme zkontrolovat všechna prázdná pole, jestli nebylo kliknuto na ně.
                         #Pozice políček sudoku je v nich uložena relativně vůči tabulce, která je ale na obrazovce posunutá \
                         #o 20 pixelů dolů a doprava, proto musíme upravit i pozici kurzoru.
@@ -785,12 +793,36 @@ def hra():
                                 aktivni_policko = pole.aktivni(aktivni_policko)
                                 #Už jsme našli místo, kde bylo kliknuto, a tedy nemusíme prozkoumávat ostatní pole.
                                 break
+                
+                if event.type == pygame.KEYDOWN:
+                    #Jakékoli klávesy nás zajímají pouze pokud máme nějaké zvolené aktivní políčko.abs
+                    if aktivni_policko != None:
+                        #Pokud jsme v módu mazání, zajímá nás pouze stisknutí klávesy backspace nebo delete
+                        if mod == 3:
+                            #Pokud byl stisknuto backspace nebo delete, tak chceme smazat hodnotu v aktivním políčku.
+                            if event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
+                                aktivni_policko.vepsana_hodnota = None
+                        #Pokud nejsme v módu mazání, tak chceme zjistit jestli uživatel zadal číslo.
+                        zmacknuto = event.unicode
+                        #Pokud ano, postup se bude lišit pro mód vpisování hodnoty a mód vpisování možných hodnot.
+                        if zmacknuto in "123456789":
+                            #U 1. módu jednoduše zapíšeme hodnotu.
+                            if mod == 1:
+                                aktivni_policko.vepsana_hodnota = zmacknuto
+                            #U druhého zkontroujeme zda daná hodnota je v seznamu možných hodnot, v takovém případě \
+                            #ji odstraníme. Pokud tam není, tak ji tam přidáme.
+                            elif mod == 2:
+                                if zmacknuto in aktivni_policko.vepsane_mozne_hodnoty:
+                                    aktivni_policko.vepsane_mozne_hodnoty = odstran_hodnotu_ze_seznamu(
+                                        aktivni_policko.vepsane_mozne_hodnoty, zmacknuto)
+                                else:
+                                    aktivni_policko.vepsane_mozne_hodnoty.append(zmacknuto)
 
             okno.fill(HNEDA)
             
             #Vytvoříme si surface pro sudoku tabulku. Na ní si uspořádáme políčka a pak jen celou tabulku umístíme na \
             #obrazovku. To nám umožní pozicovat políčka od (0,0).
-            tabulka = pygame.Surface((658,658))
+            tabulka = pygame.Surface((650,650))
 
             #Všechna políčka zobrazíme na tabulku.
             for i in range(81):
@@ -805,18 +837,45 @@ def hra():
                     pole.pole_sudoku = pole_sudoku    
                 #Jelikož jde o sudoku stačí jako argument umístění uvést jen pořadí políčka.
                 pole_sudoku.zobraz(tabulka, i)
-            
-            for i in range(3):
-                for j in range(3):
-                    pygame.draw.rect(tabulka, CERNA, (218*j, 218*i, 222, 222), 4)
-            
+
             #Pokud máme nějaké políčko zvýrazněné, musíme jeho pozadí přebarvit na žlutou.
             if aktivni_policko != None:
                 index_pole = policka.index(aktivni_policko)
-                aktivni_policko.pole_sudoku.barva = ZLUTA
+                aktivni_policko.pole_sudoku.barva = SVETLE_ZLUTA
                 aktivni_policko.pole_sudoku.zobraz(tabulka, index_pole)
 
+            #Nakreslíme silnější okraje mezi čtverci 3*3.
+            for i in range(4):
+                pygame.draw.line(tabulka, CERNA, (i*216, 0), (i*216, 650), 4)
+                pygame.draw.line(tabulka, CERNA, (0, i*216), (650, i*216), 4)
+
             okno.blit(tabulka, (20,20))
+
+            vepsat = tlacitko("Vepsat hodnotu", SVETLE_MODRA)
+            poznamky = tlacitko("Vepsat možnosti", FIALOVA)
+            vymazat = tlacitko("Vymazat hodnotu", CERVENA)
+
+            #Podle toho ve kterém jsme módu, se danému tlačítku zvýrazní text a okraj.
+            if mod == 1:
+                aktivni_mod = vepsat
+            elif mod == 2:
+                aktivni_mod = poznamky
+            else:
+                aktivni_mod = vymazat
+            aktivni_mod.barva_okraje = ZLUTA
+            aktivni_mod.barva_textu = ZLUTA
+
+            vepsat.zobraz(okno, (3*sirka_obrazovky//4, vyska_obrazovky//7))
+            poznamky.zobraz(okno, (3*sirka_obrazovky//4, 1*vyska_obrazovky//3))
+            vymazat.zobraz(okno, (3*sirka_obrazovky//4, 8*vyska_obrazovky//15))
+
+            #Text v tlačítku kontroly bude jiný pokud bude kontrola zapnutá nebo vypnutá.
+            if kontrolovat == False:
+                kontrola = tlacitko("Kontrola: OFF", ORANZOVA)
+            else:
+                kontrola = tlacitko("Kontrola: ON", ORANZOVA)
+            kontrola.zobraz(okno, (3*sirka_obrazovky//4, 5*vyska_obrazovky//7))
+
 
             #Zobrazíme tlačítka pro vygenerování nového sudoku a vypnutí programu.
             nove.zobraz(okno, (sirka_obrazovky/5, 8*vyska_obrazovky//9))
@@ -826,6 +885,3 @@ def hra():
 
 
 hra()
-
-#policka = vygeneruj_sudoku()
-
