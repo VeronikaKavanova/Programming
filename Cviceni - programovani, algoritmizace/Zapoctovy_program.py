@@ -865,7 +865,6 @@ def hra():
                     pole.pole_sudoku = pole_sudoku
                     pole_sudoku.zobraz(tabulka, i, kontrolovat)
 
-
             #Pokud máme nějaké políčko zvýrazněné, musíme jeho pozadí přebarvit na žlutou.
             if aktivni_policko != None:
                 index_pole = policka.index(aktivni_policko)
